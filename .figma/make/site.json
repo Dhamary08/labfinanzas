@@ -1,0 +1,10 @@
+{
+  "description": "A project setup tool that bootstraps imported apps and verifies deployment and preview readiness, helping teams prepare projects for release.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
