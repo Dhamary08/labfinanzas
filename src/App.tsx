@@ -23,7 +23,65 @@ type PurchaseItem = {
   billingCycle?: "annual" | "quarterly" | "monthly"
 }
 
-type IconName = "arrow" | "book" | "briefcase" | "cart" | "chart" | "check" | "chevron" | "clock" | "eye" | "lock" | "mail" | "menu" | "play" | "search" | "settings" | "spark" | "user" | "x"
+type AccountRole = "full" | "free" | "purchased"
+
+const accountRoleProfiles: Record<
+  AccountRole,
+  {
+    id: AccountRole
+    shortLabel: string
+    badge: string
+    name: string
+    firstName: string
+    lastName: string
+    initials: string
+    email: string
+    planLabel: string
+    description: string
+  }
+> = {
+  full: {
+    id: "full",
+    shortLabel: "1. Full acceso",
+    badge: "Full acceso · LAB+ Anual",
+    name: "Camila Soto",
+    firstName: "Camila",
+    lastName: "Soto",
+    initials: "CS",
+    email: "camila@labfinanzas.cl",
+    planLabel: "Plan LAB+ Anual (Full acceso)",
+    description:
+      "Todos los cursos e informes de la plataforma desbloqueados sin restricciones.",
+  },
+  free: {
+    id: "free",
+    shortLabel: "2. Usuario Free",
+    badge: "Usuario Free · Solo gratuitos",
+    name: "Mateo Rivas",
+    firstName: "Mateo",
+    lastName: "Rivas",
+    initials: "MR",
+    email: "mateo.rivas@correo.cl",
+    planLabel: "Cuenta Free",
+    description:
+      "Cursos gratuitos iniciados y flujo activo de compra para cursos premium, informes o membresías.",
+  },
+  purchased: {
+    id: "purchased",
+    shortLabel: "3. Cursos comprados",
+    badge: "Cursos comprados · Pago individual",
+    name: "Valentina Mora",
+    firstName: "Valentina",
+    lastName: "Mora",
+    initials: "VM",
+    email: "valentina.mora@empresa.cl",
+    planLabel: "Compras individuales",
+    description:
+      "Cursos e informes específicos adquiridos individualmente + compra de nuevos contenidos o membresía.",
+  },
+}
+
+type IconName = "arrow" | "book" | "briefcase" | "cart" | "chart" | "check" | "chevron" | "clock" | "download" | "eye" | "file" | "lock" | "mail" | "menu" | "play" | "search" | "settings" | "spark" | "user" | "x"
 
 const priceToNumber = (price: string) =>
   Number(price.replace(/[^\d]/g, "")) || 0
@@ -184,6 +242,692 @@ const courses = [
     premium: true,
   },
 ]
+
+type CourseModule = {
+  title: string
+  duration: string
+  lessons: {
+    title: string
+    duration: string
+    type: "video" | "practice"
+    preview?: boolean
+  }[]
+}
+
+type CourseDetailData = {
+  subtitle: string
+  overview: string[]
+  hoursBreakdown: {
+    videoHours: string
+    practiceHours: string
+    recommendedPace: string
+    totalLessons: number
+    downloadables: number
+  }
+  whatYouWillLearn: string[]
+  targetAudience: string[]
+  modules: CourseModule[]
+}
+
+const courseDetailsMap: Record<string, CourseDetailData> = {
+  "Finanzas para decisiones de negocio": {
+    subtitle:
+      "Interpreta estados financieros, controla la liquidez y evalúa decisiones comerciales con números claros.",
+    overview: [
+      "Este curso está diseñado para transformar la información contable y operativa de una empresa en decisiones concretas de precio, inversión, endeudamiento y crecimiento. Avanzarás desde la lectura ejecutiva del negocio hasta la proyección práctica de caja.",
+      "Las horas implicadas combinan cápsulas en video de alta claridad con plantillas descargables para que apliques cada módulo directamente sobre los números de tu propio negocio o área de trabajo.",
+    ],
+    hoursBreakdown: {
+      videoHours: "3 h 10 min en video",
+      practiceHours: "1 h 20 min de ejercicios",
+      recommendedPace: "2 semanas (2 h / semana)",
+      totalLessons: 24,
+      downloadables: 6,
+    },
+    whatYouWillLearn: [
+      "Diferenciar utilidad contable de generación real de caja operativa.",
+      "Analizar márgenes brutos, operacionales y punto de equilibrio.",
+      "Diagnosticar el capital de trabajo y el ciclo de conversión de efectivo.",
+      "Evaluar cuándo conviene financiar crecimiento con deuda o recursos propios.",
+    ],
+    targetAudience: [
+      "Dueños de pymes, emprendedores y líderes comerciales que toman decisiones de presupuesto.",
+      "Profesionales no financieros que necesitan leer resultados y defender proyectos con respaldo numérico.",
+    ],
+    modules: [
+      {
+        title: "Módulo 1 · Los tres mapas financieros del negocio",
+        duration: "34 min",
+        lessons: [
+          { title: "Cómo se conectan resultado, balance y flujo de caja", duration: "11:20", type: "video", preview: true },
+          { title: "Por qué una empresa rentable puede quedarse sin liquidez", duration: "12:40", type: "video" },
+          { title: "Ejercicio: radiografía rápida en una planilla ejecutiva", duration: "10:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 2 · Márgenes, costos y estructura operacional",
+        duration: "38 min",
+        lessons: [
+          { title: "Costos fijos, costos variables y margen de contribución", duration: "14:10", type: "video" },
+          { title: "Cálculo práctico del punto de equilibrio multiproducto", duration: "13:50", type: "video" },
+          { title: "Plantilla: simulador de sensibilidad de márgenes", duration: "10:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 3 · Gestión del capital de trabajo",
+        duration: "36 min",
+        lessons: [
+          { title: "Días de calle, rotación de inventario y plazos a proveedores", duration: "13:15", type: "video" },
+          { title: "Cómo financiar el crecimiento sin asfixiar la caja", duration: "12:45", type: "video" },
+          { title: "Caso aplicado: optimización de ciclo de caja en 90 días", duration: "10:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 4 · Flujo de caja proyectado y escenarios",
+        duration: "42 min",
+        lessons: [
+          { title: "Construcción de un flujo de caja a 13 semanas", duration: "16:20", type: "video" },
+          { title: "Escenarios base, exigido y plan de contingencia", duration: "13:40", type: "video" },
+          { title: "Plantilla descargable de seguimiento semanal", duration: "12:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 5 · Endeudamiento sano y relación con bancos",
+        duration: "32 min",
+        lessons: [
+          { title: "Deuda de corto plazo vs. financiamiento estructural", duration: "11:30", type: "video" },
+          { title: "Indicadores que miran los bancos al evaluar tu empresa", duration: "11:30", type: "video" },
+          { title: "Checklist para negociar tasas y garantías", duration: "09:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 6 · Evaluación de inversiones y nuevos proyectos",
+        duration: "35 min",
+        lessons: [
+          { title: "Retorno sobre la inversión y plazo de recuperación (Payback)", duration: "13:00", type: "video" },
+          { title: "Cómo comparar dos alternativas de crecimiento", duration: "12:00", type: "video" },
+          { title: "Ejercicio práctico de decisión de compra de equipamiento", duration: "10:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 7 · Tablero de control mensual",
+        duration: "28 min",
+        lessons: [
+          { title: "Las 6 métricas que debes revisar el día 5 de cada mes", duration: "10:40", type: "video" },
+          { title: "Alertas tempranas de desviación presupuestaria", duration: "09:20", type: "video" },
+          { title: "Configuración de tu propio resumen ejecutivo", duration: "08:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 8 · Plan de acción financiero a 90 días",
+        duration: "25 min",
+        lessons: [
+          { title: "Priorización de mejoras rápidas en margen y cobranza", duration: "09:30", type: "video" },
+          { title: "Rutina financiera para directorios y socios", duration: "08:30", type: "video" },
+          { title: "Proyecto final: hoja de ruta trimestral", duration: "07:00", type: "practice" },
+        ],
+      },
+    ],
+  },
+  "Tu primera cartera de inversión": {
+    subtitle:
+      "Pasa del ahorro estacionado a una estrategia de inversión diversificada, clara y acorde a tus objetivos.",
+    overview: [
+      "Construir una cartera de inversión no consiste en elegir productos al azar ni en adivinar qué hará el mercado mañana. En este curso aprenderás el método paso a paso para definir tu horizonte, distribuir el riesgo y seleccionar instrumentos sencillos y eficientes.",
+      "A lo largo de 3 horas y 15 minutos revisarás ejemplos reales del mercado local e internacional para que termines el curso con tu propia asignación estratégica lista para implementar.",
+    ],
+    hoursBreakdown: {
+      videoHours: "2 h 20 min en video",
+      practiceHours: "55 min de ejercicios",
+      recommendedPace: "1 a 2 semanas",
+      totalLessons: 18,
+      downloadables: 5,
+    },
+    whatYouWillLearn: [
+      "Definir objetivos financieros según plazo, liquidez y tolerancia real al riesgo.",
+      "Comprender cómo funcionan la renta fija, la renta variable, la UF y el dólar en una cartera.",
+      "Evitar la falsa diversificación y los costos ocultos que erosionan tu rentabilidad.",
+      "Establecer una regla simple de aportes periódicos y rebalanceo semestral.",
+    ],
+    targetAudience: [
+      "Personas que ya ahorran y quieren dar su primer paso en inversiones con criterio propio.",
+      "Inversionistas iniciales que tienen productos sueltos y buscan ordenarlos en una estrategia coherente.",
+    ],
+    modules: [
+      {
+        title: "Módulo 1 · Antes de invertir: objetivos, plazo y liquidez",
+        duration: "32 min",
+        lessons: [
+          { title: "Ahorrar vs. invertir: el rol del tiempo y la inflación", duration: "10:30", type: "video", preview: true },
+          { title: "Los tres bloques patrimoniales: liquidez, estabilidad y crecimiento", duration: "12:30", type: "video" },
+          { title: "Ejercicio: mapa personal de objetivos y plazos", duration: "09:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 2 · Riesgo y retorno sin tecnicismos",
+        duration: "30 min",
+        lessons: [
+          { title: "Qué es la volatilidad y cómo saber cuánta puedes tolerar", duration: "11:15", type: "video" },
+          { title: "Riesgo de tasa, riesgo de crédito y riesgo de moneda", duration: "10:45", type: "video" },
+          { title: "Test práctico de perfil y capacidad de riesgo", duration: "08:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 3 · Los ladrillos de tu portafolio",
+        duration: "36 min",
+        lessons: [
+          { title: "Depósitos, money market y deuda en UF: cuándo usar cada uno", duration: "13:20", type: "video" },
+          { title: "Acciones, ETFs y fondos indexados globales", duration: "13:40", type: "video" },
+          { title: "Guía comparativa de instrumentos disponibles en Chile", duration: "09:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 4 · Diversificación real y monedas",
+        duration: "34 min",
+        lessons: [
+          { title: "Por qué tener cinco fondos parecidos no es diversificar", duration: "12:10", type: "video" },
+          { title: "Cómo combinar pesos, UF y dólares según tus metas", duration: "11:50", type: "video" },
+          { title: "Plantilla: matriz de exposición por activo y moneda", duration: "10:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 5 · Costos, comisiones e impuestos básicos",
+        duration: "31 min",
+        lessons: [
+          { title: "TAC, remuneraciones de fondos y su impacto a 5 y 10 años", duration: "11:40", type: "video" },
+          { title: "Cómo comparar dos alternativas equivalentes antes de invertir", duration: "10:20", type: "video" },
+          { title: "Calculadora de impacto de comisiones en el largo plazo", duration: "09:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 6 · Diseño y mantenimiento de tu primera cartera",
+        duration: "32 min",
+        lessons: [
+          { title: "Tres carteras modelo: conservadora, equilibrada y crecimiento", duration: "12:00", type: "video" },
+          { title: "Cómo hacer aportes mensuales y rebalancear una vez al año", duration: "10:00", type: "video" },
+          { title: "Proyecto final: tu hoja de política de inversión en 1 página", duration: "10:00", type: "practice" },
+        ],
+      },
+    ],
+  },
+  "Ordena hoy tus finanzas": {
+    subtitle:
+      "Un sistema práctico y realista para organizar ingresos, gastos, deudas y ahorro mensual sin planillas interminables.",
+    overview: [
+      "Ordenar tus finanzas personales no significa registrar cada café que compras, sino diseñar una estructura simple donde tus gastos fijos, tus metas de ahorro y tus pagos de deuda estén claros desde el primer día del mes.",
+      "En 2 horas y 40 minutos construirás tu flujo mensual automatizado, un plan concreto de salida o control de deudas y tu fondo de tranquilidad financiera.",
+    ],
+    hoursBreakdown: {
+      videoHours: "1 h 50 min en video",
+      practiceHours: "50 min de ejercicios",
+      recommendedPace: "1 semana (30 min al día)",
+      totalLessons: 15,
+      downloadables: 4,
+    },
+    whatYouWillLearn: [
+      "Armar un presupuesto por bloques que funcione en la vida real y tome menos de 20 minutos al mes.",
+      "Diagnosticar tu carga financiera y priorizar el pago de tarjetas o créditos caros.",
+      "Construir un fondo de emergencia calibrado a tu estabilidad de ingresos.",
+      "Separar cuentas y automatizar el ahorro al inicio del mes.",
+    ],
+    targetAudience: [
+      "Personas que sienten que su ingreso se diluye durante el mes sin claridad de hacia dónde va.",
+      "Quienes buscan ordenar deudas de consumo o tarjetas y empezar a ahorrar con constancia.",
+    ],
+    modules: [
+      {
+        title: "Módulo 1 · Diagnóstico honesto y sin culpa",
+        duration: "30 min",
+        lessons: [
+          { title: "Tu foto financiera actual en 15 minutos", duration: "10:20", type: "video", preview: true },
+          { title: "Fugas invisibles de dinero y gastos estacionales", duration: "10:40", type: "video" },
+          { title: "Plantilla: radiografía mensual de ingresos y compromisos", duration: "09:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 2 · El presupuesto con propósito (método de 4 bloques)",
+        duration: "34 min",
+        lessons: [
+          { title: "Costos esenciales, estilo de vida, metas y tranquilidad", duration: "12:15", type: "video" },
+          { title: "Cómo adaptar el presupuesto si tienes ingresos variables", duration: "11:45", type: "video" },
+          { title: "Ejercicio: distribución ideal de tu próximo mes", duration: "10:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 3 · Estrategia inteligente frente a las deudas",
+        duration: "34 min",
+        lessons: [
+          { title: "Deuda buena vs. deuda cara: cómo leer la CAE y el costo total", duration: "12:30", type: "video" },
+          { title: "Método avalancha vs. bola de nieve para salir de deudas", duration: "11:30", type: "video" },
+          { title: "Simulador de aceleración de pago de deudas", duration: "10:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 4 · Tu fondo de emergencia y blindaje personal",
+        duration: "32 min",
+        lessons: [
+          { title: "Cuántos meses necesitas realmente y dónde guardarlo", duration: "11:20", type: "video" },
+          { title: "Instrumentos líquidos que protegen contra la inflación", duration: "10:40", type: "video" },
+          { title: "Plan de construcción gradual de tu reserva", duration: "10:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 5 · Automatización y rutina de 20 minutos al mes",
+        duration: "30 min",
+        lessons: [
+          { title: "Arquitectura de cuentas para no depender de la fuerza de voluntad", duration: "10:30", type: "video" },
+          { title: "Revisión mensual de cierre y ajuste de metas", duration: "09:30", type: "video" },
+          { title: "Checklist final de orden financiero personal", duration: "10:00", type: "practice" },
+        ],
+      },
+    ],
+  },
+  "Cómo leer el mercado cada mañana": {
+    subtitle:
+      "Construye una rutina de 15 minutos para entender inflación, tasas, dólar y bolsas sin ahogarte en ruido informativo.",
+    overview: [
+      "Todos los días aparecen decenas de titulares económicos contradictorios. Este curso te enseña a filtrar lo relevante y a seguir los pocos indicadores que realmente mueven el tipo de cambio, las tasas de interés y los activos financieros.",
+      "Combinamos explicaciones aplicadas con casos reales de jornadas de mercado para que desarrolles criterio propio al leer prensa financiera e informes económicos.",
+    ],
+    hoursBreakdown: {
+      videoHours: "2 h 45 min en video",
+      practiceHours: "1 h 05 min de lectura guiada",
+      recommendedPace: "2 semanas",
+      totalLessons: 21,
+      downloadables: 5,
+    },
+    whatYouWillLearn: [
+      "Identificar los 5 indicadores diarios que resumen el pulso del mercado global y local.",
+      "Interpretar comunicados de bancos centrales, datos de IPC e Imacec.",
+      "Entender la relación entre cobre, tasas en EE. UU. y el dólar en Chile.",
+      "Distinguir volatilidad de corto plazo de cambios de tendencia estructurales.",
+    ],
+    targetAudience: [
+      "Inversionistas y profesionales que quieren entender el contexto económico diario en pocos minutos.",
+      "Ejecutivos que toman decisiones expuestas a tipo de cambio, inflación o tasas de financiamiento.",
+    ],
+    modules: [
+      {
+        title: "Módulo 1 · Qué mueve a los mercados antes de la apertura",
+        duration: "34 min",
+        lessons: [
+          { title: "El mapa global: bolsas, bonos del Tesoro y materias primas", duration: "12:20", type: "video", preview: true },
+          { title: "Por qué el mercado se adelanta a las noticias oficiales", duration: "11:40", type: "video" },
+          { title: "Guía: tu panel de lectura matinal en 15 minutos", duration: "10:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 2 · Inflación y bancos centrales",
+        duration: "35 min",
+        lessons: [
+          { title: "Cómo leer el IPC mensual y la inflación subyacente", duration: "13:10", type: "video" },
+          { title: "Reuniones de política monetaria (RPM y Fed): qué mirar en el comunicado", duration: "12:50", type: "video" },
+          { title: "Caso real: reacción de tasas tras una sorpresa inflacionaria", duration: "09:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 3 · Dólar, cobre y flujo internacional",
+        duration: "36 min",
+        lessons: [
+          { title: "Los tres motores del tipo de cambio en Chile", duration: "13:30", type: "video" },
+          { title: "Dollar Index (DXY), cobre y diferencial de tasas", duration: "12:30", type: "video" },
+          { title: "Ejercicio: lectura de escenarios cambiarios", duration: "10:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 4 · Curva de tasas y renta fija",
+        duration: "32 min",
+        lessons: [
+          { title: "Tasas cortas vs. tasas largas: qué nos dice la pendiente de la curva", duration: "11:45", type: "video" },
+          { title: "Tasas en pesos vs. tasas en UF (compensación inflacionaria)", duration: "11:15", type: "video" },
+          { title: "Práctica: interpretación de movimientos de tasas", duration: "09:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 5 · Actividad económica y resultados corporativos",
+        duration: "31 min",
+        lessons: [
+          { title: "Imacec, empleo y confianza empresarial", duration: "11:20", type: "video" },
+          { title: "Temporada de resultados: ingresos, EBITDA y guías futuras", duration: "10:40", type: "video" },
+          { title: "Ficha de lectura rápida de resultados trimestrales", duration: "09:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 6 · Sentimiento de mercado y gestión del ruido",
+        duration: "30 min",
+        lessons: [
+          { title: "Indicadores de aversión al riesgo y titulares alarmistas", duration: "11:00", type: "video" },
+          { title: "Cuándo una noticia amerita ajustar tu cartera y cuándo no hacer nada", duration: "10:00", type: "video" },
+          { title: "Checklist contra decisiones impulsivas", duration: "09:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 7 · Tu rutina semanal de análisis",
+        duration: "32 min",
+        lessons: [
+          { title: "Calendario económico semanal: qué eventos agendar", duration: "11:30", type: "video" },
+          { title: "Cómo conectar los informes Claves Financieras con tus decisiones", duration: "10:30", type: "video" },
+          { title: "Plantilla personal de seguimiento semanal", duration: "10:00", type: "practice" },
+        ],
+      },
+    ],
+  },
+  "Flujo de caja sin complicaciones": {
+    subtitle:
+      "Aprende a proyectar entradas, salidas y necesidades de financiamiento para que la liquidez de tu negocio nunca te tome por sorpresa.",
+    overview: [
+      "El flujo de caja es la herramienta más importante para la supervivencia y tranquilidad de cualquier negocio. En este curso directo y práctico aprenderás a armar, leer y actualizar un flujo de caja operativo sin requerir conocimientos contables avanzados.",
+      "En 2 horas y 20 minutos pasarás de mirar el saldo bancario del día a tener visibilidad completa de las próximas 13 semanas de operación.",
+    ],
+    hoursBreakdown: {
+      videoHours: "1 h 35 min en video",
+      practiceHours: "45 min de plantilla guiada",
+      recommendedPace: "1 semana",
+      totalLessons: 15,
+      downloadables: 4,
+    },
+    whatYouWillLearn: [
+      "Armar desde cero un flujo de caja operativo semanal y mensual.",
+      "Separar ingresos devengados (facturas emitidas) de cobranza efectivamente disponible.",
+      "Planificar el pago de IVA, imposiciones, sueldos y proveedores críticos sin sobresaltos.",
+      "Detectar brechas de liquidez con semanas de anticipación para negociar a tiempo.",
+    ],
+    targetAudience: [
+      "Emprendedores, dueños de negocios y encargados de administración o tesorería.",
+      "Profesionales independientes y estudios que necesitan estabilizar sus flujos mensuales.",
+    ],
+    modules: [
+      {
+        title: "Módulo 1 · La regla de oro: facturar no es cobrar",
+        duration: "26 min",
+        lessons: [
+          { title: "Diferencia entre estado de resultados y flujo de efectivo real", duration: "09:30", type: "video", preview: true },
+          { title: "Los tres bolsillos de la caja: operación, inversión y financiamiento", duration: "09:30", type: "video" },
+          { title: "Diagnóstico rápido de los últimos 30 días de tu negocio", duration: "07:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 2 · Proyección de cobranza e ingresos reales",
+        duration: "28 min",
+        lessons: [
+          { title: "Cómo estimar fechas reales de pago según el historial de cada cliente", duration: "10:15", type: "video" },
+          { title: "Políticas simples para acelerar la entrada de efectivo", duration: "09:45", type: "video" },
+          { title: "Plantilla: calendario de cuentas por cobrar", duration: "08:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 3 · Orden y priorización de egresos",
+        duration: "28 min",
+        lessons: [
+          { title: "Egresos fijos impostergables, impuestos y pagos variables", duration: "10:00", type: "video" },
+          { title: "Cómo provisionar IVA y leyes sociales sin tocar el capital operativo", duration: "10:00", type: "video" },
+          { title: "Ejercicio de clasificación y calendario de pagos", duration: "08:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 4 · El flujo rodante de 13 semanas",
+        duration: "30 min",
+        lessons: [
+          { title: "Paso a paso para construir tu planilla de 13 semanas", duration: "11:30", type: "video" },
+          { title: "Cómo identificar semanas críticas y preparar líneas de respaldo", duration: "09:30", type: "video" },
+          { title: "Descarga y carga de datos en la plantilla maestra", duration: "09:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 5 · Rutina semanal de tesorería",
+        duration: "28 min",
+        lessons: [
+          { title: "La reunión de 20 minutos cada lunes para actualizar la caja", duration: "09:40", type: "video" },
+          { title: "Qué hacer con los excedentes temporales de liquidez", duration: "09:20", type: "video" },
+          { title: "Checklist operativo de control de caja", duration: "09:00", type: "practice" },
+        ],
+      },
+    ],
+  },
+  "Fondos mutuos desde cero": {
+    subtitle:
+      "Entiende qué hay dentro de cada fondo, cuánto cuestan realmente y cómo elegir la serie y categoría correcta para tus metas.",
+    overview: [
+      "Los fondos mutuos y fondos de inversión son la puerta de entrada más utilizada para invertir en Chile, pero sus folletos informativos, series y comisiones suelen confundir. En este curso aprenderás a leerlos en pocos minutos y a comparar alternativas con total transparencia.",
+      "Durante 3 horas y 10 minutos revisaremos casos reales de fondos money market, deuda en UF, balanceados y accionarios para que sepas exactamente qué estás contratando.",
+    ],
+    hoursBreakdown: {
+      videoHours: "2 h 15 min en video",
+      practiceHours: "55 min de análisis de folletos",
+      recommendedPace: "1 a 2 semanas",
+      totalLessons: 18,
+      downloadables: 4,
+    },
+    whatYouWillLearn: [
+      "Cómo funciona un fondo mutuo, qué es el valor cuota y cómo se calcula tu rentabilidad.",
+      "Distinguir entre fondos Money Market, Renta Fija, Balanceados y Accionarios.",
+      "Entender la Tasa Anual de Costos (TAC), las series de un fondo y las comisiones de salida.",
+      "Leer un folleto informativo y evaluar si el fondo cumple lo que promete.",
+    ],
+    targetAudience: [
+      "Personas que invierten o planean invertir a través de bancos, AGF o plataformas digitales.",
+      "Ahorrantes que quieren revisar si los fondos que hoy tienen en cartera cobran comisiones excesivas.",
+    ],
+    modules: [
+      {
+        title: "Módulo 1 · Qué es un fondo mutuo y cómo gana valor",
+        duration: "31 min",
+        lessons: [
+          { title: "Patrimonio común, aportes, rescates y valor cuota diario", duration: "11:20", type: "video", preview: true },
+          { title: "Diferencia entre fondos mutuos, fondos de inversión y ETFs", duration: "11:40", type: "video" },
+          { title: "Guía rápida de conceptos esenciales", duration: "08:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 2 · Categorías de fondos: para qué sirve cada una",
+        duration: "34 min",
+        lessons: [
+          { title: "Fondos de deuda de corto plazo (Money Market) vs. mediano y largo plazo", duration: "12:30", type: "video" },
+          { title: "Fondos balanceados y fondos de renta variable nacional e internacional", duration: "12:30", type: "video" },
+          { title: "Mapa práctico: qué categoría usar según tu plazo", duration: "09:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 3 · El impacto real de los costos (TAC y series)",
+        duration: "32 min",
+        lessons: [
+          { title: "Qué es la TAC y cómo se descuenta todos los días del valor cuota", duration: "12:00", type: "video" },
+          { title: "Cómo elegir la serie correcta (APV, digital, alto patrimonio o general)", duration: "11:00", type: "video" },
+          { title: "Ejercicio: comparando dos fondos idénticos con distinta comisión", duration: "09:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 4 · Cómo leer un folleto informativo en 5 minutos",
+        duration: "33 min",
+        lessons: [
+          { title: "Cartera de inversiones, duración, monedas y principales emisores", duration: "12:20", type: "video" },
+          { title: "Rentabilidad histórica vs. consistencia y riesgo asumido", duration: "11:40", type: "video" },
+          { title: "Práctica guiada con 3 folletos reales del mercado", duration: "09:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 5 · Liquidez, plazos de rescate y tributación básica",
+        duration: "30 min",
+        lessons: [
+          { title: "En cuántos días recibes tu dinero al rescatar y horarios de corte", duration: "10:40", type: "video" },
+          { title: "Mayor valor en el rescate, postergación por reinversión y APV", duration: "10:20", type: "video" },
+          { title: "Resumen descargable de reglas operativas", duration: "09:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 6 · Arma y audita tu selección de fondos",
+        duration: "30 min",
+        lessons: [
+          { title: "Los 5 errores más comunes al contratar fondos en el banco", duration: "10:30", type: "video" },
+          { title: "Cómo combinar 2 o 3 fondos eficientes para cubrir todos tus objetivos", duration: "10:30", type: "video" },
+          { title: "Checklist de auditoría para tus fondos actuales", duration: "09:00", type: "practice" },
+        ],
+      },
+    ],
+  },
+  "Ahorro con objetivos reales": {
+    subtitle:
+      "Deja de ahorrar 'lo que sobre a fin de mes' y convierte tus metas personales o familiares en un plan medible y alcanzable.",
+    overview: [
+      "Ahorrar sin un objetivo concreto y sin una fecha suele terminar en frustración o en usar ese dinero ante el primer imprevisto. Este curso breve y accionable te enseña a cuantificar tus metas, protegerlas de la inflación y automatizar el camino para cumplirlas.",
+      "En 1 hora y 45 minutos configurarás tu sistema de ahorro por objetivos de corto y mediano plazo con herramientas listas para usar.",
+    ],
+    hoursBreakdown: {
+      videoHours: "1 h 10 min en video",
+      practiceHours: "35 min de planificación",
+      recommendedPace: "3 a 5 días",
+      totalLessons: 12,
+      downloadables: 3,
+    },
+    whatYouWillLearn: [
+      "Transformar deseos vagos en metas financieras con monto en UF/pesos y fecha exacta.",
+      "Calcular cuánto necesitas aportar cada mes y qué instrumento usar según el plazo.",
+      "Proteger tus ahorros de la inflación utilizando instrumentos simples y seguros.",
+      "Mantener la constancia mediante aportes automáticos y metas intermedias.",
+    ],
+    targetAudience: [
+      "Personas que quieren ahorrar para un pie hipotecario, estudios, viajes o proyectos personales.",
+      "Quienes buscan empezar un hábito de ahorro ordenado desde montos accesibles.",
+    ],
+    modules: [
+      {
+        title: "Módulo 1 · Del deseo al objetivo financiero concreto",
+        duration: "26 min",
+        lessons: [
+          { title: "Por qué falla la regla de ahorrar lo que sobra", duration: "08:50", type: "video", preview: true },
+          { title: "Cómo poner nombre, monto real y plazo a tus 3 metas principales", duration: "09:10", type: "video" },
+          { title: "Plantilla: matriz de objetivos a 6, 18 y 36 meses", duration: "08:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 2 · Cuánto ahorrar y cómo ganarle a la inflación",
+        duration: "28 min",
+        lessons: [
+          { title: "El efecto silencioso de la inflación y por qué medir metas en UF", duration: "10:00", type: "video" },
+          { title: "Cálculo de la cuota mensual necesaria para llegar a tu meta", duration: "09:00", type: "video" },
+          { title: "Calculadora descargable de ahorro por objetivo", duration: "09:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 3 · Dónde guardar el dinero de cada meta",
+        duration: "26 min",
+        lessons: [
+          { title: "Cuentas remuneradas, depósitos a plazo, UF y fondos conservadores", duration: "09:30", type: "video" },
+          { title: "Por qué no debes arriesgar en acciones el ahorro que usarás en 1 año", duration: "08:30", type: "video" },
+          { title: "Guía de selección de instrumento según horizonte", duration: "08:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 4 · Automatización y seguimiento sin fricción",
+        duration: "25 min",
+        lessons: [
+          { title: "La regla de pagarte primero el día que recibes tu ingreso", duration: "08:30", type: "video" },
+          { title: "Cómo ajustar el plan cuando cambian tus ingresos o gastos", duration: "08:30", type: "video" },
+          { title: "Tablero visual de avance de metas", duration: "08:00", type: "practice" },
+        ],
+      },
+    ],
+  },
+  "Precios, costos y rentabilidad": {
+    subtitle:
+      "Calcula el costo real de tus productos o servicios, fija precios con respaldo financiero y defiende el margen de tu empresa.",
+    overview: [
+      "Uno de los errores más costosos en las empresas es fijar precios mirando únicamente a la competencia o aplicando un recargo intuitivo sin conocer los costos ocultos de operar, vender y financiar al cliente. En este curso aprenderás una metodología clara para costear con precisión y diseñar precios rentables.",
+      "A través de 4 horas y 10 minutos de contenido práctico y simuladores en planilla, aprenderás a medir la rentabilidad real por línea de producto, servicio o cliente.",
+    ],
+    hoursBreakdown: {
+      videoHours: "2 h 55 min en video",
+      practiceHours: "1 h 15 min de simulación",
+      recommendedPace: "2 semanas",
+      totalLessons: 24,
+      downloadables: 6,
+    },
+    whatYouWillLearn: [
+      "Identificar todos los costos directos, indirectos, logísticos y financieros de tu oferta.",
+      "Evitar la confusión entre recargo sobre costo (markup) y margen real sobre venta.",
+      "Evaluar el impacto real de un descuento comercial en tus utilidades antes de otorgarlo.",
+      "Analizar qué productos o clientes aportan margen y cuáles destruyen rentabilidad.",
+    ],
+    targetAudience: [
+      "Empresarios, gerentes comerciales y encargados de operaciones o finanzas en pymes.",
+      "Emprendedores y consultores de servicios que necesitan estructurar tarifas rentables.",
+    ],
+    modules: [
+      {
+        title: "Módulo 1 · Por qué vender más puede hacerte ganar menos",
+        duration: "31 min",
+        lessons: [
+          { title: "La diferencia crítica entre markup (recargo) y margen bruto", duration: "11:20", type: "video", preview: true },
+          { title: "Los costos invisibles: mermas, comisiones de pago, plazos y posventa", duration: "10:40", type: "video" },
+          { title: "Ejercicio: diagnóstico del margen real de tu producto principal", duration: "09:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 2 · Costeo práctico para productos y servicios",
+        duration: "34 min",
+        lessons: [
+          { title: "Costos unitarios directos en empresas comerciales y productivas", duration: "12:15", type: "video" },
+          { title: "Cómo calcular el costo hora-hombre real en empresas de servicios", duration: "11:45", type: "video" },
+          { title: "Plantilla descargable de costeo unitario completo", duration: "10:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 3 · Asignación de gastos fijos y punto de equilibrio",
+        duration: "32 min",
+        lessons: [
+          { title: "Cómo absorber la estructura fija sin distorsionar tus precios", duration: "11:30", type: "video" },
+          { title: "Volumen mínimo necesario por línea de negocio", duration: "11:30", type: "video" },
+          { title: "Simulador de absorción de costos fijos", duration: "09:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 4 · Estrategia de precios basada en valor y margen",
+        duration: "32 min",
+        lessons: [
+          { title: "Piso de costo, referencia competitiva y techo de valor percibido", duration: "11:40", type: "video" },
+          { title: "Diseño de planes, paquetes y escalas de precios", duration: "11:20", type: "video" },
+          { title: "Matriz práctica de posicionamiento de precios", duration: "09:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 5 · La matemática real de los descuentos comerciales",
+        duration: "30 min",
+        lessons: [
+          { title: "Cuánto más debes vender para compensar un 10% de descuento", duration: "11:00", type: "video" },
+          { title: "Políticas de descuento por volumen o pronto pago que cuidan el margen", duration: "10:00", type: "video" },
+          { title: "Calculadora de impacto de descuentos para equipos de venta", duration: "09:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 6 · Inflación, tipo de cambio y reajuste de precios",
+        duration: "31 min",
+        lessons: [
+          { title: "Cómo proteger tu margen cuando suben los insumos o el dólar", duration: "11:15", type: "video" },
+          { title: "Cláusulas de reajuste en UF y comunicación con clientes", duration: "10:45", type: "video" },
+          { title: "Guía para actualizar listas de precios sin perder clientes clave", duration: "09:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 7 · Rentabilidad por cliente y mezcla de ventas (Mix)",
+        duration: "30 min",
+        lessons: [
+          { title: "Matriz ABC de productos y clientes según margen de contribución", duration: "10:30", type: "video" },
+          { title: "Cómo empujar el mix hacia tus líneas más rentables", duration: "10:30", type: "video" },
+          { title: "Ejercicio: ranking de contribución de tu cartera actual", duration: "09:00", type: "practice" },
+        ],
+      },
+      {
+        title: "Módulo 8 · Plan de mejora de rentabilidad",
+        duration: "30 min",
+        lessons: [
+          { title: "Palancas rápidas para ganar 3 a 5 puntos de margen operacional", duration: "10:30", type: "video" },
+          { title: "Indicadores comerciales semanales para gerencia", duration: "10:30", type: "video" },
+          { title: "Proyecto final: nueva arquitectura de precios y márgenes", duration: "09:00", type: "practice" },
+        ],
+      },
+    ],
+  },
+}
 
 const catalogCourses = [
   ...courses,
@@ -628,10 +1372,22 @@ function Icon({ name, size = 20 }: { name: IconName; size?: number }) {
         <path d="M12 7v5l3 2" />
       </>
     ),
+    download: (
+      <>
+        <path d="M12 3v12m0 0-4-4m4 4 4-4" />
+        <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+      </>
+    ),
     eye: (
       <>
         <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z" />
         <circle cx="12" cy="12" r="2.5" />
+      </>
+    ),
+    file: (
+      <>
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
+        <path d="M14 2v6h6M8 13h8M8 17h5" />
       </>
     ),
     lock: (
@@ -932,7 +1688,7 @@ function CourseCard({
   onOpen: () => void
 }) {
   return (
-    <article className="course-card">
+    <article className="course-card" onClick={onOpen}>
       <div className="course-image">
         <img src={course.image} alt="" />
         <CategorySymbol type="courses" />
@@ -948,7 +1704,10 @@ function CourseCard({
         <button
           className="play-button"
           aria-label={`Ver ${course.title}`}
-          onClick={onOpen}
+          onClick={(event) => {
+            event.stopPropagation()
+            onOpen()
+          }}
         >
           <Icon name="play" size={18} />
         </button>
@@ -969,7 +1728,12 @@ function CourseCard({
         </div>
         <div className="course-bottom">
           <strong>{course.price}</strong>
-          <button onClick={onOpen}>
+          <button
+            onClick={(event) => {
+              event.stopPropagation()
+              onOpen()
+            }}
+          >
             Ver curso <Icon name="arrow" size={17} />
           </button>
         </div>
@@ -1005,18 +1769,529 @@ function ArticleCard({
   )
 }
 
-function CourseBrowser({
+type CatalogCourseItem = (typeof catalogCourses)[number]
+
+function CourseDetailView({
+  course,
   account = false,
+  accountRole = "full",
+  isOwned = false,
+  onBack,
+  onSelectCourse,
+  onStartLearningCourse,
   navigate,
   addToCart,
+  startCheckout,
   cartItems = [],
 }: {
+  course: CatalogCourseItem
   account?: boolean
+  accountRole?: AccountRole
+  isOwned?: boolean
+  onBack: () => void
+  onSelectCourse: (courseTitle: string) => void
+  onStartLearningCourse?: (courseTitle: string) => void
   navigate: (page: Page) => void
   addToCart?: (item: PurchaseItem) => void
+  startCheckout?: (item: PurchaseItem) => void
   cartItems?: PurchaseItem[]
 }) {
+  const detail =
+    courseDetailsMap[course.title] ??
+    courseDetailsMap["Tu primera cartera de inversión"]
+  const [expandedModules, setExpandedModules] = useState<number[]>(() =>
+    detail.modules.map((_, index) => index),
+  )
+  useEffect(() => {
+    setExpandedModules(detail.modules.map((_, index) => index))
+  }, [course.title, detail.modules])
+
+  const inCart = cartItems.some((item) => item.title === course.title)
+  const unlocked =
+    !course.premium || (account && (accountRole === "full" || isOwned))
+  const allExpanded = expandedModules.length === detail.modules.length
+  const toggleModule = (index: number) => {
+    setExpandedModules((current) =>
+      current.includes(index)
+        ? current.filter((item) => item !== index)
+        : [...current, index],
+    )
+  }
+  const toggleAllModules = () => {
+    setExpandedModules(
+      allExpanded ? [] : detail.modules.map((_, index) => index),
+    )
+  }
+  const relatedCourses = catalogCourses
+    .filter((item) => item.title !== course.title)
+    .slice(0, 3)
+
+  const handlePrimaryCourseAction = () => {
+    if (unlocked) {
+      if (onStartLearningCourse) {
+        onStartLearningCourse(course.title)
+        return
+      }
+      navigate("learning")
+      return
+    }
+    if (course.premium) {
+      addToCart?.({
+        kind: "course",
+        title: course.title,
+        subtitle: `${course.lessons} · ${course.time}`,
+        price: course.price,
+        image: course.image,
+      })
+      return
+    }
+    if (onStartLearningCourse) {
+      onStartLearningCourse(course.title)
+      return
+    }
+    navigate("learning")
+  }
+
+  return (
+    <section
+      className={
+        account ? "course-detail-page account-mode" : "course-detail-page"
+      }
+    >
+      <div className="course-detail-topbar">
+        <button
+          type="button"
+          className="course-detail-back"
+          onClick={onBack}
+        >
+          <span>←</span> Volver a explorar cursos
+        </button>
+        <div className="course-detail-crumbs">
+          <span>Explorar cursos</span>
+          <span>·</span>
+          <span>{course.audience}</span>
+          <span>·</span>
+          <strong>Nivel {course.level}</strong>
+        </div>
+      </div>
+
+      <div className="course-detail-shell">
+        <div className="course-detail-main">
+          <header className="course-detail-header">
+            <div className="course-detail-badges">
+              <span className="course-detail-category">{course.audience}</span>
+              <span
+                className={
+                  unlocked
+                    ? "badge free"
+                    : course.premium
+                      ? "badge premium"
+                      : "badge free"
+                }
+              >
+                {account && accountRole === "full" && course.premium ? (
+                  <>
+                    <Icon name="check" size={13} /> Incluido en tu LAB+
+                  </>
+                ) : account && isOwned && course.premium ? (
+                  <>
+                    <Icon name="check" size={13} /> Curso adquirido
+                  </>
+                ) : course.premium ? (
+                  <>
+                    <Icon name="lock" size={13} /> Curso Premium
+                  </>
+                ) : (
+                  "Acceso gratuito"
+                )}
+              </span>
+              <span className="course-detail-level-pill">
+                Nivel {course.level}
+              </span>
+            </div>
+            <h1>{course.title}</h1>
+            <p className="course-detail-subtitle">{detail.subtitle}</p>
+
+            <div className="course-hours-strip">
+              <div className="course-hours-item">
+                <Icon name="clock" size={18} />
+                <div>
+                  <small>Horas implicadas</small>
+                  <strong>{course.time} en total</strong>
+                  <span>
+                    {detail.hoursBreakdown.videoHours} +{" "}
+                    {detail.hoursBreakdown.practiceHours}
+                  </span>
+                </div>
+              </div>
+              <div className="course-hours-item">
+                <Icon name="book" size={18} />
+                <div>
+                  <small>Estructura del curso</small>
+                  <strong>
+                    {course.lessons} · {detail.hoursBreakdown.totalLessons}{" "}
+                    lecciones
+                  </strong>
+                  <span>
+                    Incluye {detail.hoursBreakdown.downloadables} recursos
+                    descargables
+                  </span>
+                </div>
+              </div>
+              <div className="course-hours-item">
+                <Icon name="spark" size={18} />
+                <div>
+                  <small>Ritmo sugerido</small>
+                  <strong>{detail.hoursBreakdown.recommendedPace}</strong>
+                  <span>100% online y a tu propio ritmo</span>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <div className="course-detail-preview">
+            <img src={course.image} alt={course.title} />
+            <div className="course-detail-preview-overlay">
+              <span className="course-preview-tag">
+                <Icon name="play" size={14} /> Vista previa del curso · Lección
+                1 abierta
+              </span>
+              <div>
+                <strong>{detail.modules[0]?.lessons[0]?.title}</strong>
+                <span>
+                  {detail.modules[0]?.lessons[0]?.duration} · {course.lessons} ·{" "}
+                  {course.time}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <section className="course-detail-box">
+            <h2>Lo que aprenderás</h2>
+            <div className="course-learn-grid">
+              {detail.whatYouWillLearn.map((item) => (
+                <div className="course-learn-item" key={item}>
+                  <Icon name="check" size={16} />
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="course-detail-section">
+            <h2>Detalle del curso</h2>
+            {detail.overview.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+            <div className="course-audience-box">
+              <strong>¿Para quién es este curso?</strong>
+              <ul>
+                {detail.targetAudience.map((target) => (
+                  <li key={target}>{target}</li>
+                ))}
+              </ul>
+            </div>
+          </section>
+
+          <section className="course-detail-section">
+            <div className="course-curriculum-head">
+              <div>
+                <h2>Contenido del curso</h2>
+                <p>
+                  {course.lessons} · {detail.hoursBreakdown.totalLessons}{" "}
+                  lecciones · {course.time} de dedicación total
+                </p>
+              </div>
+              <button
+                type="button"
+                className="course-expand-btn"
+                onClick={toggleAllModules}
+              >
+                {allExpanded
+                  ? "Contraer todos los módulos"
+                  : "Expandir todos los módulos"}
+              </button>
+            </div>
+
+            <div className="course-curriculum-list">
+              {detail.modules.map((mod, index) => {
+                const isOpen = expandedModules.includes(index)
+                return (
+                  <div
+                    className={
+                      isOpen
+                        ? "course-module-item open"
+                        : "course-module-item"
+                    }
+                    key={mod.title}
+                  >
+                    <button
+                      type="button"
+                      className="course-module-trigger"
+                      onClick={() => toggleModule(index)}
+                    >
+                      <div className="course-module-title">
+                        <Icon name="chevron" size={16} />
+                        <strong>{mod.title}</strong>
+                      </div>
+                      <span className="course-module-meta">
+                        {mod.lessons.length} lecciones · {mod.duration}
+                      </span>
+                    </button>
+                    {isOpen && (
+                      <ul className="course-lesson-list">
+                        {mod.lessons.map((lesson) => (
+                          <li key={lesson.title}>
+                            <div className="course-lesson-name">
+                              <Icon
+                                name={
+                                  lesson.type === "video" ? "play" : "file"
+                                }
+                                size={14}
+                              />
+                              <span>{lesson.title}</span>
+                              {lesson.preview && (
+                                <em className="course-lesson-preview">
+                                  Vista previa
+                                </em>
+                              )}
+                              {lesson.type === "practice" && (
+                                <em className="course-lesson-practice">
+                                  Práctica guiada
+                                </em>
+                              )}
+                            </div>
+                            <small>{lesson.duration}</small>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </section>
+        </div>
+
+        <aside className="course-detail-sidebar">
+          <div className="course-summary-card">
+            <div className="course-summary-price">
+              <span>
+                {account && accountRole === "full"
+                  ? "Disponible en tu membresía"
+                  : account && isOwned && course.premium
+                    ? "Ya en tu biblioteca"
+                    : course.premium
+                      ? "Compra individual"
+                      : "Curso abierto"}
+              </span>
+              <strong>
+                {account && accountRole === "full" && course.premium
+                  ? "Incluido en LAB+"
+                  : account && isOwned && course.premium
+                    ? "Adquirido"
+                    : course.price}
+              </strong>
+              <small>
+                {account && accountRole === "full"
+                  ? "Tienes full acceso a todas las lecciones, ejercicios y descargables de este curso."
+                  : account && isOwned && course.premium
+                    ? "Compraste este curso individualmente. Tienes acceso ilimitado para avanzar a tu ritmo."
+                    : course.premium
+                      ? "Acceso permanente al curso o incluido sin costo adicional en la membresía LAB+"
+                      : "Acceso libre a todos los módulos y recursos descargables"}
+              </small>
+            </div>
+
+            <button
+              type="button"
+              className="primary full"
+              disabled={!unlocked && course.premium && inCart}
+              onClick={handlePrimaryCourseAction}
+            >
+              {unlocked ? (
+                <>
+                  Comenzar curso ahora <Icon name="play" size={16} />
+                </>
+              ) : course.premium ? (
+                inCart ? (
+                  <>
+                    En la cesta <Icon name="check" size={16} />
+                  </>
+                ) : (
+                  <>
+                    Añadir a la cesta <Icon name="arrow" size={16} />
+                  </>
+                )
+              ) : (
+                <>
+                  Comenzar curso gratis <Icon name="play" size={16} />
+                </>
+              )}
+            </button>
+
+            {!unlocked && course.premium && startCheckout && (
+              <button
+                type="button"
+                className="secondary full course-summary-secondary"
+                onClick={() =>
+                  startCheckout({
+                    kind: "course",
+                    title: course.title,
+                    subtitle: `${course.lessons} · ${course.time}`,
+                    price: course.price,
+                    image: course.image,
+                  })
+                }
+              >
+                Comprar este curso ahora ({course.price}){" "}
+                <Icon name="arrow" size={15} />
+              </button>
+            )}
+
+            {(!account || (accountRole !== "full" && !unlocked)) && (
+              <button
+                type="button"
+                className="secondary full course-summary-secondary"
+                onClick={() => navigate("plans")}
+              >
+                Acceder a todo con LAB+ <Icon name="arrow" size={15} />
+              </button>
+            )}
+
+            <div className="course-summary-specs">
+              <strong>Este curso incluye:</strong>
+              <ul>
+                <li>
+                  <Icon name="clock" size={15} />
+                  <span>
+                    <strong>{course.time}</strong> de horas implicadas (
+                    {detail.hoursBreakdown.videoHours} y{" "}
+                    {detail.hoursBreakdown.practiceHours})
+                  </span>
+                </li>
+                <li>
+                  <Icon name="book" size={15} />
+                  <span>
+                    <strong>{course.lessons}</strong> estructurados en{" "}
+                    {detail.hoursBreakdown.totalLessons} lecciones paso a paso
+                  </span>
+                </li>
+                <li>
+                  <Icon name="download" size={15} />
+                  <span>
+                    <strong>{detail.hoursBreakdown.downloadables}</strong>{" "}
+                    plantillas y guías prácticas descargables
+                  </span>
+                </li>
+                <li>
+                  <Icon name="check" size={15} />
+                  <span>
+                    Nivel <strong>{course.level}</strong> · Acceso a tu propio
+                    ritmo en web y móvil
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <div className="course-related-block">
+        <div className="section-heading row">
+          <div>
+            <span className="eyebrow">Seguir explorando</span>
+            <h2>Otros cursos que te pueden interesar</h2>
+          </div>
+          <button type="button" className="text-link" onClick={onBack}>
+            Ver todos los cursos <Icon name="arrow" size={18} />
+          </button>
+        </div>
+        <div className="course-grid">
+          {relatedCourses.map((related) => (
+            <CourseCard
+              key={related.title}
+              course={related}
+              onOpen={() => onSelectCourse(related.title)}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function CourseBrowser({
+  account = false,
+  accountRole = "full",
+  ownedCourses = [],
+  navigate,
+  addToCart,
+  startCheckout,
+  cartItems = [],
+  selectedCourseTitle = null,
+  onSelectCourse,
+  onStartLearningCourse,
+}: {
+  account?: boolean
+  accountRole?: AccountRole
+  ownedCourses?: string[]
+  navigate: (page: Page) => void
+  addToCart?: (item: PurchaseItem) => void
+  startCheckout?: (item: PurchaseItem) => void
+  cartItems?: PurchaseItem[]
+  selectedCourseTitle?: string | null
+  onSelectCourse?: (courseTitle: string | null) => void
+  onStartLearningCourse?: (courseTitle: string) => void
+}) {
   const [category, setCategory] = useState("Todos")
+  const [internalCourseTitle, setInternalCourseTitle] = useState<string | null>(
+    null,
+  )
+  const activeCourseTitle =
+    selectedCourseTitle !== undefined && onSelectCourse
+      ? selectedCourseTitle
+      : internalCourseTitle
+  const selectCourse = (courseTitle: string | null) => {
+    if (onSelectCourse) {
+      onSelectCourse(courseTitle)
+    } else {
+      setInternalCourseTitle(courseTitle)
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+  const isCourseOwned = (title: string, isPremium: boolean) => {
+    if (!isPremium) return true
+    if (!account) return false
+    if (accountRole === "full") return true
+    return ownedCourses.includes(title)
+  }
+  const activeCourse = catalogCourses.find(
+    (course) => course.title === activeCourseTitle,
+  )
+  if (activeCourse) {
+    return (
+      <div
+        className={
+          account ? "course-browser account-browser" : "course-browser"
+        }
+      >
+        <CourseDetailView
+          course={activeCourse}
+          account={account}
+          accountRole={accountRole}
+          isOwned={isCourseOwned(activeCourse.title, activeCourse.premium)}
+          onBack={() => selectCourse(null)}
+          onSelectCourse={(title) => selectCourse(title)}
+          onStartLearningCourse={onStartLearningCourse}
+          navigate={navigate}
+          addToCart={addToCart}
+          startCheckout={startCheckout}
+          cartItems={cartItems}
+        />
+      </div>
+    )
+  }
   const categories = [
     "Todos",
     "Finanzas personales",
@@ -1029,23 +2304,48 @@ function CourseBrowser({
       ? catalogCourses
       : catalogCourses.filter((course) => course.audience === category)
   const rows = account
-    ? [
-        {
-          title: "Recomendados para ti",
-          subtitle: "Según tus intereses y actividad reciente",
-          items: filtered.slice(0, 5),
-        },
-        {
-          title: "Porque estás aprendiendo sobre inversiones",
-          subtitle: "Profundiza los conceptos de tu ruta actual",
-          items: [...filtered].reverse().slice(0, 5),
-        },
-        {
-          title: "Cursos incluidos en tu plan",
-          subtitle: "Acceso completo con Lab+ Anual",
-          items: catalogCourses.filter((course) => course.premium).slice(0, 5),
-        },
-      ]
+    ? accountRole === "full"
+      ? [
+          {
+            title: "Disponibles en tu plan Full Acceso (LAB+)",
+            subtitle: "Todos los cursos desbloqueados para aprender sin límites",
+            items: filtered,
+          },
+          {
+            title: "Cursos especializados y de negocios",
+            subtitle: "Incluidos sin costo adicional en tu membresía",
+            items: catalogCourses.filter((course) => course.premium),
+          },
+        ]
+      : accountRole === "free"
+        ? [
+            {
+              title: "Tus cursos gratuitos disponibles",
+              subtitle: "Iniciados en tu cuenta Free · Continúa gratis cuando quieras",
+              items: catalogCourses.filter((course) => !course.premium),
+            },
+            {
+              title: "Cursos Premium para comprar o desbloquear con LAB+",
+              subtitle: "Adquiérelos individualmente o suscríbete a LAB+ para acceso total",
+              items: catalogCourses.filter((course) => course.premium),
+            },
+          ]
+        : [
+            {
+              title: "Tus cursos adquiridos y gratuitos",
+              subtitle: "Cursos comprados en tu cuenta listos para continuar",
+              items: catalogCourses.filter((course) =>
+                isCourseOwned(course.title, course.premium),
+              ),
+            },
+            {
+              title: "Próximos cursos para agregar a tu biblioteca",
+              subtitle: "Compra cursos individuales o pásate a LAB+ Anual",
+              items: catalogCourses.filter(
+                (course) => !isCourseOwned(course.title, course.premium),
+              ),
+            },
+          ]
     : [
         {
           title: "Cursos para empezar",
@@ -1094,10 +2394,10 @@ function CourseBrowser({
           <div className="browser-actions">
             <button
               className="light-button"
-              onClick={() => navigate(account ? "learning" : "login")}
+              onClick={() => selectCourse("Tu primera cartera de inversión")}
             >
               <Icon name="play" size={18} />{" "}
-              {account ? "Comenzar curso" : "Inscribirme gratis"}
+              {account ? "Ver detalle del curso" : "Ver detalle y temario"}
             </button>
             <button className="ghost-button">
               <span>+</span> Mi lista
@@ -1131,24 +2431,70 @@ function CourseBrowser({
         {account && (
           <section className="browser-progress-banner">
             <div className="progress-course-thumb">
-              <img src={images.calculator} alt="" />
+              <img
+                src={
+                  accountRole === "free"
+                    ? images.laptop
+                    : accountRole === "purchased"
+                      ? images.desk
+                      : images.calculator
+                }
+                alt=""
+              />
               <span>
                 <Icon name="play" size={15} />
               </span>
             </div>
             <div>
               <small>CONTINÚA DONDE QUEDASTE</small>
-              <h3>Ordena hoy tus finanzas</h3>
-              <p>Lección 4 · Presupuesto con propósito</p>
+              <h3>
+                {accountRole === "free"
+                  ? "Tu primera cartera de inversión"
+                  : accountRole === "purchased"
+                    ? "Finanzas para decisiones de negocio"
+                    : "Ordena hoy tus finanzas"}
+              </h3>
+              <p>
+                {accountRole === "free"
+                  ? "Módulo 2 · Riesgo y retorno sin tecnicismos (Curso gratuito)"
+                  : accountRole === "purchased"
+                    ? "Módulo 5 · Endeudamiento sano y relación con bancos (Curso comprado)"
+                    : "Lección 4 · Presupuesto con propósito (Full acceso LAB+)"}
+              </p>
             </div>
             <div className="progress-resume">
-              <span>72% completado</span>
+              <span>
+                {accountRole === "free"
+                  ? "45% completado"
+                  : accountRole === "purchased"
+                    ? "68% completado"
+                    : "72% completado"}
+              </span>
               <div>
-                <i />
+                <i
+                  style={{
+                    width:
+                      accountRole === "free"
+                        ? "45%"
+                        : accountRole === "purchased"
+                          ? "68%"
+                          : "72%",
+                  }}
+                />
               </div>
             </div>
-            <button onClick={() => navigate("learning")}>
-              Continuar <Icon name="arrow" size={16} />
+            <button
+              onClick={() =>
+                selectCourse(
+                  accountRole === "free"
+                    ? "Tu primera cartera de inversión"
+                    : accountRole === "purchased"
+                      ? "Finanzas para decisiones de negocio"
+                      : "Ordena hoy tus finanzas",
+                )
+              }
+            >
+              Ver curso <Icon name="arrow" size={16} />
             </button>
           </section>
         )}
@@ -1170,37 +2516,44 @@ function CourseBrowser({
                 </div>
               </div>
               <div className="rail-track">
-                {row.items.map((course, index) => (
+                {row.items.map((course, index) => {
+                  const owned = isCourseOwned(course.title, course.premium)
+                  const inCart = cartItems.some(
+                    (item) => item.title === course.title,
+                  )
+                  return (
                   <article
                     className="stream-card"
                     key={`${row.title}-${course.title}`}
+                    onClick={() => selectCourse(course.title)}
                   >
                     <div>
                       <img src={course.image} alt="" />
                       <span className="stream-number">
                         {String(index + 1).padStart(2, "0")}
                       </span>
-                      {course.premium && (
+                      {course.premium && !owned && (
                         <span className="stream-lock">
                           <Icon name="lock" size={12} />
                         </span>
                       )}
+                      {account && owned && (
+                        <span className="stream-owned-pill">
+                          {!course.premium
+                            ? "Gratis"
+                            : accountRole === "full"
+                              ? "LAB+"
+                              : "Comprado"}
+                        </span>
+                      )}
                       <button
-                        onClick={() =>
-                          account
-                            ? navigate("learning")
-                            : course.premium
-                              ? addToCart?.({
-                                  kind: "course",
-                                  title: course.title,
-                                  subtitle: `${course.lessons} · ${course.time}`,
-                                  price: course.price,
-                                  image: course.image,
-                                })
-                              : navigate("login")
-                        }
+                        aria-label={`Ver descripción de ${course.title}`}
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          selectCourse(course.title)
+                        }}
                       >
-                        <Icon name={account ? "play" : "arrow"} size={17} />
+                        <Icon name={owned ? "play" : "arrow"} size={17} />
                       </button>
                     </div>
                     <span className="stream-category">{course.audience}</span>
@@ -1209,20 +2562,26 @@ function CourseBrowser({
                       <span>{course.level}</span>
                       <span>{course.time}</span>
                       {!course.premium && <strong>Gratis</strong>}
+                      {account && course.premium && owned && (
+                        <strong>
+                          {accountRole === "full" ? "Incluido" : "Adquirido"}
+                        </strong>
+                      )}
                     </div>
-                    {!account && (
+                    {(!account || !owned) && (
                       <div className="stream-purchase">
                         <p>
                           {course.premium
-                            ? "Añádelo hoy y aprende a tu propio ritmo."
+                            ? "Compra individual o desbloquéalo con LAB+."
                             : "Empieza gratis y avanza cuando quieras."}
                         </p>
                         <div>
                           <strong>{course.price}</strong>
                           <button
-                            className={cartItems.some((item) => item.title === course.title) ? "added" : ""}
-                            disabled={course.premium && cartItems.some((item) => item.title === course.title)}
-                            onClick={() =>
+                            className={inCart ? "added" : ""}
+                            disabled={course.premium && inCart}
+                            onClick={(event) => {
+                              event.stopPropagation()
                               course.premium
                                 ? addToCart?.({
                                     kind: "course",
@@ -1231,25 +2590,48 @@ function CourseBrowser({
                                     price: course.price,
                                     image: course.image,
                                   })
-                                : navigate("login")
-                            }
+                                : selectCourse(course.title)
+                            }}
                           >
                             {course.premium
-                              ? cartItems.some((item) => item.title === course.title)
+                              ? inCart
                                 ? "En la cesta"
                                 : "Añadir a la cesta"
-                              : "Inscribirme"}
+                              : "Ver curso"}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                    {account && owned && (
+                      <div className="stream-purchase owned">
+                        <p>
+                          {accountRole === "full"
+                            ? "Disponible en tu membresía LAB+."
+                            : !course.premium
+                              ? "Curso gratuito activo en tu cuenta."
+                              : "Curso adquirido en tu biblioteca."}
+                        </p>
+                        <div>
+                          <strong>Disponible</strong>
+                          <button
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              selectCourse(course.title)
+                            }}
+                          >
+                            Ver detalle y clases
                           </button>
                         </div>
                       </div>
                     )}
                   </article>
-                ))}
+                  )
+                })}
               </div>
             </section>
           ))}
         </div>
-        {!account && (
+        {(!account || accountRole !== "full") && (
           <section className="browser-public-cta">
             <div>
               <span className="eyebrow light">Acceso completo</span>
@@ -1276,11 +2658,19 @@ function CourseBrowser({
 function PublicCatalog({
   navigate,
   addToCart,
+  startCheckout,
   cartItems,
+  selectedCourseTitle,
+  onSelectCourse,
+  onStartLearningCourse,
 }: {
   navigate: (page: Page) => void
   addToCart: (item: PurchaseItem) => void
+  startCheckout: (item: PurchaseItem) => void
   cartItems: PurchaseItem[]
+  selectedCourseTitle: string | null
+  onSelectCourse: (courseTitle: string | null) => void
+  onStartLearningCourse: (courseTitle: string) => void
 }) {
   const [contentType, setContentType] = useState<"courses" | "reports">(
     "courses",
@@ -1295,20 +2685,33 @@ function PublicCatalog({
         <div>
           <button
             className={contentType === "courses" ? "active" : ""}
-            onClick={() => setContentType("courses")}
+            onClick={() => {
+              setContentType("courses")
+            }}
           >
             <Icon name="book" size={16} /> Cursos
           </button>
           <button
             className={contentType === "reports" ? "active" : ""}
-            onClick={() => setContentType("reports")}
+            onClick={() => {
+              onSelectCourse(null)
+              setContentType("reports")
+            }}
           >
             <Icon name="chart" size={16} /> Informes
           </button>
         </div>
       </div>
       {contentType === "courses" ? (
-        <CourseBrowser navigate={navigate} addToCart={addToCart} cartItems={cartItems} />
+        <CourseBrowser
+          navigate={navigate}
+          addToCart={addToCart}
+          startCheckout={startCheckout}
+          cartItems={cartItems}
+          selectedCourseTitle={selectedCourseTitle}
+          onSelectCourse={onSelectCourse}
+          onStartLearningCourse={onStartLearningCourse}
+        />
       ) : (
         <ReportBrowser publicMode navigate={navigate} addToCart={addToCart} cartItems={cartItems} />
       )}
@@ -1390,7 +2793,7 @@ function PremiumPlans({
             <span className="popular-badge">Más elegido</span>
           </div>
           <div className="billing-tabs">
-            {(Object.keys(plans) as keyof typeof plans[]).map((key) => (
+            {(Object.keys(plans) as (keyof typeof plans)[]).map((key) => (
               <button
                 key={key}
                 className={billing === key ? "active" : ""}
@@ -1553,10 +2956,12 @@ function Home({
   navigate,
   startCheckout,
   openArticle,
+  openCourse,
 }: {
   navigate: (page: Page) => void
   startCheckout: (item: PurchaseItem) => void
   openArticle: (articleId: string) => void
+  openCourse: (courseTitle: string) => void
 }) {
   return (
     <>
@@ -1704,11 +3109,7 @@ function Home({
               <CourseCard
                 key={course.title}
                 course={course}
-                onOpen={() =>
-                  navigate(
-                    course.audience === "Empresas" ? "business" : "personal",
-                  )
-                }
+                onOpen={() => openCourse(course.title)}
               />
             ))}
           </div>
@@ -1832,9 +3233,11 @@ const learningData = {
 function LearningPage({
   kind,
   navigate,
+  openCourse,
 }: {
   kind: "business" | "personal"
   navigate: (page: Page) => void
+  openCourse: (courseTitle: string) => void
 }) {
   const data = learningData[kind]
   const filtered =
@@ -1884,7 +3287,7 @@ function LearningPage({
             <CourseCard
               key={course.title}
               course={course}
-              onOpen={() => navigate("login")}
+              onOpen={() => openCourse(course.title)}
             />
           ))}
         </div>
@@ -4042,7 +5445,15 @@ function Checkout({
   )
 }
 
-function Login({ navigate }: { navigate: (page: Page) => void }) {
+function Login({
+  navigate,
+  accountRole,
+  onSelectRoleAndEnter,
+}: {
+  navigate: (page: Page) => void
+  accountRole: AccountRole
+  onSelectRoleAndEnter: (role: AccountRole) => void
+}) {
   const [mode, setMode] = useState<"login" | "register">("login")
   const [show, setShow] = useState(false)
   const [interest, setInterest] = useState<"personal" | "business">("personal")
@@ -4148,7 +5559,9 @@ function Login({ navigate }: { navigate: (page: Page) => void }) {
               <button
                 className="social-button"
                 onClick={() =>
-                  mode === "login" ? navigate("history") : setAccessSent(true)
+                  mode === "login"
+                    ? onSelectRoleAndEnter(accountRole)
+                    : setAccessSent(true)
                 }
               >
                 <span>G</span>
@@ -4202,7 +5615,8 @@ function Login({ navigate }: { navigate: (page: Page) => void }) {
                   <input
                     type="email"
                     placeholder="nombre@correo.com"
-                    defaultValue="demo@labfinanzas.cl"
+                    key={accountRole}
+                    defaultValue={accountRoleProfiles[accountRole].email}
                   />
                 ) : (
                   <input
@@ -4253,7 +5667,9 @@ function Login({ navigate }: { navigate: (page: Page) => void }) {
               <button
                 className="primary full"
                 onClick={() =>
-                  mode === "login" ? navigate("history") : setAccessSent(true)
+                  mode === "login"
+                    ? onSelectRoleAndEnter(accountRole)
+                    : setAccessSent(true)
                 }
               >
                 {mode === "login" ? "Iniciar sesión" : "Crear mi cuenta"}{" "}
@@ -4290,10 +5706,35 @@ function Login({ navigate }: { navigate: (page: Page) => void }) {
 function Dashboard({
   page,
   navigate,
+  accountRole,
+  onChangeAccountRole,
+  ownedCourses,
+  ownedReports,
+  cartItems,
+  addToCart,
+  startCheckout,
+  goToCartCheckout,
+  accountCourseTitle,
+  onSelectAccountCourse,
+  activeLearningCourseTitle,
+  onSelectLearningCourse,
 }: {
   page: "discover" | "discoverReports" | "learning" | "history" | "notifications" | "settings"
   navigate: (page: Page) => void
+  accountRole: AccountRole
+  onChangeAccountRole: (role: AccountRole) => void
+  ownedCourses: string[]
+  ownedReports: string[]
+  cartItems: PurchaseItem[]
+  addToCart: (item: PurchaseItem) => void
+  startCheckout: (item: PurchaseItem) => void
+  goToCartCheckout: () => void
+  accountCourseTitle: string | null
+  onSelectAccountCourse: (courseTitle: string | null) => void
+  activeLearningCourseTitle: string | null
+  onSelectLearningCourse: (courseTitle: string | null) => void
 }) {
+  const profile = accountRoleProfiles[accountRole]
   const menu: { key: Page; label: string; icon: IconName }[] = [
     { key: "discover", label: "Explorar cursos", icon: "search" },
     { key: "discoverReports", label: "Explorar informes", icon: "chart" },
@@ -4302,6 +5743,14 @@ function Dashboard({
     { key: "notifications", label: "Notificaciones", icon: "mail" },
     { key: "settings", label: "Configuración", icon: "settings" },
   ]
+  const openCourseInDiscover = (courseTitle: string) => {
+    onSelectAccountCourse(courseTitle)
+    navigate("discover")
+  }
+  const startLearningCourse = (courseTitle: string) => {
+    onSelectLearningCourse(courseTitle)
+    navigate("learning")
+  }
   return (
     <main className="account-layout">
       <aside className="account-sidebar">
@@ -4309,10 +5758,10 @@ function Dashboard({
           <Logo />
         </button>
         <div className="account-user">
-          <span>CS</span>
+          <span>{profile.initials}</span>
           <div>
-            <strong>Camila Soto</strong>
-            <small>Plan Premium</small>
+            <strong>{profile.name}</strong>
+            <small>{profile.planLabel}</small>
           </div>
         </div>
         <nav>
@@ -4320,7 +5769,15 @@ function Dashboard({
             <button
               key={item.key}
               className={page === item.key ? "active" : ""}
-              onClick={() => navigate(item.key)}
+              onClick={() => {
+                if (item.key === "discover") {
+                  onSelectAccountCourse(null)
+                }
+                if (item.key === "learning") {
+                  onSelectLearningCourse(null)
+                }
+                navigate(item.key)
+              }}
             >
               <Icon name={item.icon} size={19} />
               {item.label}
@@ -4328,41 +5785,151 @@ function Dashboard({
             </button>
           ))}
         </nav>
+        {accountRole !== "full" && (
+          <div className="sidebar-upgrade-card">
+            <small>MEMBRESÍA LAB+</small>
+            <strong>Desbloquea todo el catálogo</strong>
+            <p>
+              Accede sin límites a todos los cursos e informes desde $6.665/mes.
+            </p>
+            <button type="button" onClick={() => navigate("plans")}>
+              Ver planes LAB+ <Icon name="arrow" size={14} />
+            </button>
+          </div>
+        )}
         <button className="back-home" onClick={() => navigate("home")}>
           <Icon name="arrow" size={18} /> Volver al sitio
         </button>
       </aside>
-      {page === "discover" ? (
-        <section className="account-discover">
-          <CourseBrowser account navigate={navigate} />
-        </section>
-      ) : page === "discoverReports" ? (
-        <section className="account-discover">
-          <ReportBrowser navigate={navigate} />
-        </section>
-      ) : (
-        <section className="account-main">
-          <div className="account-top">
-            <div>
-              <span className="eyebrow">Mi cuenta</span>
-              <h1>
-                {page === "learning"
-                  ? "Mi aprendizaje"
-                  : page === "history"
-                    ? "Mi historial"
-                    : page === "notifications"
-                      ? "Notificaciones"
-                      : "Configuración"}
-              </h1>
-            </div>
-            <button className="avatar-button">CS</button>
+      <div className="account-workspace">
+        <div className="account-role-bar">
+          <div className="account-role-bar-copy">
+            <span className="account-role-pill">{profile.badge}</span>
+            <p>{profile.description}</p>
           </div>
-          {page === "learning" && <MyLearning />}
-          {page === "history" && <History />}
-          {page === "notifications" && <Notifications />}
-          {page === "settings" && <Settings />}
-        </section>
-      )}
+          <div className="account-role-bar-actions">
+            <div className="account-role-tabs" role="tablist">
+              {(["full", "free", "purchased"] as AccountRole[]).map(
+                (roleKey) => (
+                  <button
+                    type="button"
+                    key={roleKey}
+                    className={accountRole === roleKey ? "active" : ""}
+                    onClick={() => onChangeAccountRole(roleKey)}
+                  >
+                    {accountRoleProfiles[roleKey].shortLabel}
+                  </button>
+                ),
+              )}
+            </div>
+            <button
+              type="button"
+              className="account-cart-btn"
+              onClick={() =>
+                cartItems.length > 0 ? goToCartCheckout() : navigate("catalog")
+              }
+            >
+              <Icon name="cart" size={16} />
+              <span>
+                {cartItems.length > 0
+                  ? `Cesta (${cartItems.length}) · ${purchaseTotal(cartItems)}`
+                  : "Cesta (0)"}
+              </span>
+            </button>
+          </div>
+        </div>
+
+        {page === "discover" ? (
+          <section className="account-discover">
+            <CourseBrowser
+              account
+              accountRole={accountRole}
+              ownedCourses={ownedCourses}
+              navigate={navigate}
+              addToCart={addToCart}
+              startCheckout={startCheckout}
+              cartItems={cartItems}
+              selectedCourseTitle={accountCourseTitle}
+              onSelectCourse={onSelectAccountCourse}
+              onStartLearningCourse={startLearningCourse}
+            />
+          </section>
+        ) : page === "discoverReports" ? (
+          <section className="account-discover">
+            <ReportBrowser
+              navigate={navigate}
+              accountRole={accountRole}
+              ownedReports={ownedReports}
+              addToCart={addToCart}
+              startCheckout={startCheckout}
+              cartItems={cartItems}
+            />
+          </section>
+        ) : (
+          <section className="account-main">
+            <div className="account-top">
+              <div>
+                <span className="eyebrow">
+                  Mi cuenta · {profile.planLabel}
+                </span>
+                <h1>
+                  {page === "learning"
+                    ? "Mi aprendizaje"
+                    : page === "history"
+                      ? "Mi historial"
+                      : page === "notifications"
+                        ? "Notificaciones"
+                        : "Configuración"}
+                </h1>
+              </div>
+              <button
+                className="avatar-button"
+                onClick={() => navigate("settings")}
+                title={profile.name}
+              >
+                {profile.initials}
+              </button>
+            </div>
+            {page === "learning" && (
+              <MyLearning
+                accountRole={accountRole}
+                ownedCourses={ownedCourses}
+                ownedReports={ownedReports}
+                navigate={navigate}
+                onOpenCourse={openCourseInDiscover}
+                activeCourseTitle={activeLearningCourseTitle}
+                onSelectActiveCourse={onSelectLearningCourse}
+                addToCart={addToCart}
+                cartItems={cartItems}
+              />
+            )}
+            {page === "history" && (
+              <History
+                accountRole={accountRole}
+                ownedCourses={ownedCourses}
+                navigate={navigate}
+                onOpenCourse={startLearningCourse}
+              />
+            )}
+            {page === "notifications" && (
+              <Notifications
+                accountRole={accountRole}
+                navigate={navigate}
+                onOpenCourse={openCourseInDiscover}
+              />
+            )}
+            {page === "settings" && (
+              <Settings
+                accountRole={accountRole}
+                ownedCourses={ownedCourses}
+                ownedReports={ownedReports}
+                navigate={navigate}
+                startCheckout={startCheckout}
+              />
+            )}
+          </section>
+        )}
+      </div>
     </main>
   )
 }
@@ -4370,15 +5937,24 @@ function Dashboard({
 function ReportBrowser({
   navigate,
   publicMode = false,
+  accountRole = "full",
+  ownedReports = [],
   addToCart,
+  startCheckout,
   cartItems = [],
 }: {
   navigate: (page: Page) => void
   publicMode?: boolean
+  accountRole?: AccountRole
+  ownedReports?: string[]
   addToCart?: (item: PurchaseItem) => void
+  startCheckout?: (item: PurchaseItem) => void
   cartItems?: PurchaseItem[]
 }) {
   const [reportFilter, setReportFilter] = useState("Todos")
+  const [selectedReportTitle, setSelectedReportTitle] = useState<string | null>(
+    null,
+  )
   const reports = [
     {
       type: "Mensual",
@@ -4390,6 +5966,11 @@ function ReportBrowser({
       date: "14 Jun 2025",
       price: "$6.990",
       code: "PM",
+      highlights: [
+        "Trayectoria esperada de la TPM para el segundo semestre y efecto en tasas bancarias.",
+        "Escenarios para el dólar observado ($940 - $985) según cobre y Reserva Federal.",
+        "Posicionamiento sugerido en renta fija en UF y duración media.",
+      ],
     },
     {
       type: "Trimestral",
@@ -4401,6 +5982,11 @@ function ReportBrowser({
       date: "03 Jun 2025",
       price: "$17.990",
       code: "EE",
+      highlights: [
+        "Proyecciones de crecimiento PIB e Imacec por sector productivo.",
+        "Dinámica del empleo, consumo privado e inversión en maquinaria.",
+        "Riesgos externos e impacto comercial en empresas locales.",
+      ],
     },
     {
       type: "Especial",
@@ -4412,6 +5998,11 @@ function ReportBrowser({
       date: "28 May 2025",
       price: "$9.990",
       code: "FM",
+      highlights: [
+        "Comparativa de TAC y comisiones por categoría de fondos en Chile.",
+        "Criterios prácticos para elegir entre Money Market, Deuda UF y Balanceados.",
+        "Cómo evitar la duplicidad de activos entre distintas administradoras.",
+      ],
     },
     {
       type: "Mensual",
@@ -4423,6 +6014,11 @@ function ReportBrowser({
       date: "15 May 2025",
       price: "$6.990",
       code: "CE",
+      highlights: [
+        "Costo promedio de financiamiento comercial y líneas de capital de trabajo.",
+        "Plazos efectivos de pago por industria y gestión preventiva de cobranza.",
+        "Cobertura cambiaria simple para pymes importadoras.",
+      ],
     },
     {
       type: "Anual",
@@ -4434,6 +6030,11 @@ function ReportBrowser({
       date: "10 Ene 2025",
       price: "$49.990",
       code: "PI",
+      highlights: [
+        "Asignación estratégica de activos para perfiles conservador, moderado y agresivo.",
+        "Valoraciones relativas entre renta variable local, EE. UU. y mercados emergentes.",
+        "Mapa de riesgos geopolíticos y de tasas globales para todo el año.",
+      ],
     },
     {
       type: "Especial",
@@ -4445,13 +6046,200 @@ function ReportBrowser({
       date: "22 Abr 2025",
       price: "$8.990",
       code: "US",
+      highlights: [
+        "Relación histórica entre precio del cobre, DXY y peso chileno.",
+        "Cuándo cubrir flujos en dólares y cómo escalonar compras de divisas.",
+        "Niveles técnicos y fundamentales de referencia para el trimestre.",
+      ],
     },
   ]
+  const isReportUnlocked = (title: string) => {
+    if (publicMode) return false
+    if (accountRole === "full") return true
+    return ownedReports.includes(title)
+  }
+  const selectedReport = reports.find(
+    (item) => item.title === selectedReportTitle,
+  )
+  if (selectedReport) {
+    const unlocked = isReportUnlocked(selectedReport.title)
+    const inCart = cartItems.some((item) => item.title === selectedReport.title)
+    return (
+      <div
+        className={`report-browser ${publicMode ? "public-report-browser" : ""}`}
+      >
+        <div className="report-detail-view">
+          <div className="course-detail-topbar">
+            <button
+              type="button"
+              className="course-detail-back"
+              onClick={() => setSelectedReportTitle(null)}
+            >
+              <span>←</span> Volver a explorar informes
+            </button>
+            <div className="course-detail-crumbs">
+              <span>Informes Claves Financieras</span>
+              <span>·</span>
+              <span>{selectedReport.topic}</span>
+              <span>·</span>
+              <strong>{selectedReport.type}</strong>
+            </div>
+          </div>
+          <div className="course-detail-shell">
+            <div className="course-detail-main">
+              <div className="course-detail-badges">
+                <span className="course-detail-category">
+                  Informe {selectedReport.type}
+                </span>
+                <span className={unlocked ? "badge free" : "badge premium"}>
+                  {unlocked ? (
+                    <>
+                      <Icon name="check" size={13} /> Disponible en tu biblioteca
+                    </>
+                  ) : (
+                    <>
+                      <Icon name="lock" size={13} /> Informe de pago
+                    </>
+                  )}
+                </span>
+                <span className="course-detail-level-pill">
+                  {selectedReport.date} · {selectedReport.pages}
+                </span>
+              </div>
+              <h1>{selectedReport.title}</h1>
+              <p className="course-detail-subtitle">
+                {selectedReport.description}
+              </p>
+              <section className="course-detail-box" style={{ marginTop: 24 }}>
+                <h2>Puntos clave del informe</h2>
+                <div className="course-learn-grid">
+                  {selectedReport.highlights.map((point) => (
+                    <div className="course-learn-item" key={point}>
+                      <Icon name="check" size={16} />
+                      <span>{point}</span>
+                    </div>
+                  ))}
+                </div>
+              </section>
+              <section className="course-detail-section">
+                <h2>Resumen ejecutivo</h2>
+                <p>
+                  Este informe de Claves Financieras sintetiza los indicadores
+                  relevantes del período con tablas comparativas, escenarios
+                  base y alternativos, e implicancias directas para personas y
+                  empresas.
+                </p>
+                {unlocked ? (
+                  <div className="unlocked-report-reader">
+                    <strong>
+                      Lectura completa habilitada ({selectedReport.pages})
+                    </strong>
+                    <p>
+                      Tienes acceso completo a este informe. Puedes leer el
+                      análisis íntegro en línea o descargar la edición en PDF
+                      con todos los gráficos y series de datos.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="locked-report-notice">
+                    <Icon name="lock" size={18} />
+                    <div>
+                      <strong>
+                        Adquiere este informe o actívalo con tu membresía LAB+
+                      </strong>
+                      <p>
+                        Puedes comprarlo de forma individual por{" "}
+                        {selectedReport.price} o desbloquear toda la biblioteca
+                        de informes con LAB+.
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </section>
+            </div>
+            <aside className="course-detail-sidebar">
+              <div className="course-summary-card">
+                <div className="course-summary-price">
+                  <span>
+                    {unlocked ? "En tu biblioteca" : "Edición digital PDF"}
+                  </span>
+                  <strong>{unlocked ? "Adquirido" : selectedReport.price}</strong>
+                  <small>
+                    {unlocked
+                      ? "Disponible para lectura inmediata y descarga en tu cuenta."
+                      : `${selectedReport.type} · ${selectedReport.pages} · Acceso permanente`}
+                  </small>
+                </div>
+                {unlocked ? (
+                  <button
+                    type="button"
+                    className="primary full"
+                    onClick={() => navigate("learning")}
+                  >
+                    Abrir en Mi aprendizaje <Icon name="eye" size={16} />
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      className="primary full"
+                      disabled={inCart}
+                      onClick={() =>
+                        addToCart?.({
+                          kind: "report",
+                          title: selectedReport.title,
+                          subtitle: `${selectedReport.type} · ${selectedReport.pages}`,
+                          price: selectedReport.price,
+                          code: selectedReport.code,
+                        })
+                      }
+                    >
+                      {inCart ? "En la cesta" : "Añadir a la cesta"}{" "}
+                      <Icon name={inCart ? "check" : "cart"} size={16} />
+                    </button>
+                    {startCheckout && (
+                      <button
+                        type="button"
+                        className="secondary full course-summary-secondary"
+                        onClick={() =>
+                          startCheckout({
+                            kind: "report",
+                            title: selectedReport.title,
+                            subtitle: `${selectedReport.type} · ${selectedReport.pages}`,
+                            price: selectedReport.price,
+                            code: selectedReport.code,
+                          })
+                        }
+                      >
+                        Comprar ahora ({selectedReport.price}){" "}
+                        <Icon name="arrow" size={15} />
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      className="secondary full course-summary-secondary"
+                      onClick={() => navigate("plans")}
+                    >
+                      Suscribirme a LAB+ <Icon name="arrow" size={15} />
+                    </button>
+                  </>
+                )}
+              </div>
+            </aside>
+          </div>
+        </div>
+      </div>
+    )
+  }
   const filters = ["Todos", "Mercados", "Economía", "Inversiones", "Empresas"]
   const visibleReports =
     reportFilter === "Todos"
       ? reports
       : reports.filter((report) => report.topic === reportFilter)
+  const featuredUnlocked = isReportUnlocked(reports[0].title)
+  const featuredInCart = cartItems.some(
+    (item) => item.title === reports[0].title,
+  )
   return (
     <div
       className={`report-browser ${publicMode ? "public-report-browser" : ""}`}
@@ -4477,38 +6265,38 @@ function ReportBrowser({
               <Icon name="clock" size={14} />
               12 min de lectura
             </span>
-            <span>Incluido en Lab+</span>
+            <span>
+              {featuredUnlocked
+                ? "Disponible en tu cuenta"
+                : `${reports[0].price} · Incluido en Lab+`}
+            </span>
           </div>
           <div className="browser-actions">
             <button
               className="light-button"
-              onClick={() => navigate(publicMode ? "login" : "learning")}
+              onClick={() => setSelectedReportTitle(reports[0].title)}
             >
               <Icon name="eye" size={17} />{" "}
-              {publicMode ? "Ver informe" : "Leer informe"}
+              {featuredUnlocked ? "Leer informe completo" : "Ver detalle del informe"}
             </button>
-            <button
-              className="ghost-button"
-              disabled={publicMode && cartItems.some((item) => item.title === reports[0].title)}
-              onClick={() =>
-                publicMode
-                  ? addToCart?.({
-                      kind: "report",
-                      title: reports[0].title,
-                      subtitle: `${reports[0].type} · ${reports[0].pages}`,
-                      price: reports[0].price,
-                      code: reports[0].code,
-                    })
-                  : navigate("learning")
-              }
-            >
-              <span>+</span>{" "}
-              {publicMode && cartItems.some((item) => item.title === reports[0].title)
-                ? "En la cesta"
-                : publicMode
-                  ? "Añadir a la cesta"
-                  : "Guardar"}
-            </button>
+            {!featuredUnlocked && (
+              <button
+                className="ghost-button"
+                disabled={featuredInCart}
+                onClick={() =>
+                  addToCart?.({
+                    kind: "report",
+                    title: reports[0].title,
+                    subtitle: `${reports[0].type} · ${reports[0].pages}`,
+                    price: reports[0].price,
+                    code: reports[0].code,
+                  })
+                }
+              >
+                <span>+</span>{" "}
+                {featuredInCart ? "En la cesta" : "Añadir a la cesta"}
+              </button>
+            )}
           </div>
         </div>
         <div className="featured-report-cover">
@@ -4567,8 +6355,14 @@ function ReportBrowser({
           </div>
         </div>
         <div className="report-catalog-grid">
-          {visibleReports.map((report, index) => (
-            <article key={report.title}>
+          {visibleReports.map((report, index) => {
+            const unlocked = isReportUnlocked(report.title)
+            const inCart = cartItems.some((item) => item.title === report.title)
+            return (
+            <article
+              key={report.title}
+              onClick={() => setSelectedReportTitle(report.title)}
+            >
               <div className={`catalog-report-cover cr${index % 3}`}>
                 <span>
                   LAB
@@ -4589,107 +6383,130 @@ function ReportBrowser({
                   <span>{report.date}</span>
                   <span>{report.pages}</span>
                 </div>
-                {publicMode && (
+                {!unlocked && (
                   <p className="report-buy-copy">
                     Llévalo contigo y consúltalo cuando lo necesites.
                   </p>
                 )}
                 <div className="catalog-report-bottom">
-                  <strong>{report.price}</strong>
+                  <strong>
+                    {unlocked
+                      ? accountRole === "full"
+                        ? "Incluido en LAB+"
+                        : "Adquirido"
+                      : report.price}
+                  </strong>
                   <button
-                    className={
-                      publicMode &&
-                      cartItems.some((item) => item.title === report.title)
-                        ? "added"
-                        : ""
-                    }
-                    disabled={
-                      publicMode &&
-                      cartItems.some((item) => item.title === report.title)
-                    }
-                    onClick={() =>
-                      publicMode
-                        ? addToCart?.({
-                            kind: "report",
-                            title: report.title,
-                            subtitle: `${report.type} · ${report.pages}`,
-                            price: report.price,
-                            code: report.code,
-                          })
-                        : navigate("learning")
-                    }
+                    className={!unlocked && inCart ? "added" : ""}
+                    disabled={!unlocked && inCart}
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      if (unlocked) {
+                        setSelectedReportTitle(report.title)
+                        return
+                      }
+                      addToCart?.({
+                        kind: "report",
+                        title: report.title,
+                        subtitle: `${report.type} · ${report.pages}`,
+                        price: report.price,
+                        code: report.code,
+                      })
+                    }}
                   >
-                    {publicMode
-                      ? cartItems.some((item) => item.title === report.title)
+                    {!unlocked
+                      ? inCart
                         ? "En la cesta"
                         : "Añadir a la cesta"
-                      : index < 2
-                        ? "Leer ahora"
-                        : "Ver detalle"}{" "}
+                      : "Leer ahora"}{" "}
                     <Icon
-                      name={
-                        publicMode &&
-                        !cartItems.some((item) => item.title === report.title)
-                          ? "cart"
-                          : "arrow"
-                      }
+                      name={!unlocked && !inCart ? "cart" : "arrow"}
                       size={15}
                     />
                   </button>
                 </div>
               </div>
             </article>
-          ))}
+            )
+          })}
         </div>
-        <section className="report-subscription-banner">
-          <div>
-            <span className="eyebrow light">Informes por suscripción</span>
-            <h2>Recibe cada nueva edición automáticamente.</h2>
-            <p>
-              Elige una frecuencia mensual, trimestral o anual. Los informes
-              llegan a tu correo y quedan guardados en Mi aprendizaje.
-            </p>
-          </div>
-          <div>
-            <span>Desde</span>
-            <strong>$6.990</strong>
-            <small>/ mes</small>
-            <button className="light-button" onClick={() => navigate("plans")}>
-              Ver planes de informes <Icon name="arrow" size={17} />
-            </button>
-          </div>
-        </section>
+        {(publicMode || accountRole !== "full") && (
+          <section className="report-subscription-banner">
+            <div>
+              <span className="eyebrow light">Informes por suscripción</span>
+              <h2>Recibe cada nueva edición automáticamente.</h2>
+              <p>
+                Elige una frecuencia mensual, trimestral o anual. Los informes
+                llegan a tu correo y quedan guardados en Mi aprendizaje.
+              </p>
+            </div>
+            <div>
+              <span>Desde</span>
+              <strong>$6.990</strong>
+              <small>/ mes</small>
+              <button className="light-button" onClick={() => navigate("plans")}>
+                Ver planes de informes <Icon name="arrow" size={17} />
+              </button>
+            </div>
+          </section>
+        )}
       </div>
     </div>
   )
 }
 
-function MyLearning() {
+function MyLearning({
+  accountRole,
+  ownedCourses,
+  ownedReports,
+  navigate,
+  onOpenCourse,
+  activeCourseTitle,
+  onSelectActiveCourse,
+  addToCart,
+  cartItems,
+}: {
+  accountRole: AccountRole
+  ownedCourses: string[]
+  ownedReports: string[]
+  navigate: (page: Page) => void
+  onOpenCourse: (courseTitle: string) => void
+  activeCourseTitle: string | null
+  onSelectActiveCourse: (courseTitle: string | null) => void
+  addToCart: (item: PurchaseItem) => void
+  cartItems: PurchaseItem[]
+}) {
   const [content, setContent] = useState<"courses" | "reports">("courses")
-  const activeCourses = [
-    {
-      title: "Ordena hoy tus finanzas",
-      category: "Finanzas personales",
-      progress: 72,
-      lesson: "4 de 5",
-      image: images.calculator,
-    },
-    {
-      title: "Tu primera cartera de inversión",
-      category: "Inversiones",
-      progress: 38,
-      lesson: "2 de 6",
-      image: images.laptop,
-    },
-    {
-      title: "Finanzas para decisiones de negocio",
-      category: "Empresas",
-      progress: 15,
-      lesson: "1 de 8",
-      image: images.desk,
-    },
-  ]
-  const savedReports = [
+  const [selectedLessonIndex, setSelectedLessonIndex] = useState(0)
+  const [completedLessons, setCompletedLessons] = useState<string[]>([
+    "Módulo 1 · Los tres mapas financieros del negocio-0",
+    "Módulo 1 · Antes de invertir: objetivos, plazo y liquidez-0",
+    "Módulo 1 · Diagnóstico honesto y sin culpa-0",
+  ])
+  const progressMap: Record<string, { progress: number; lesson: string }> = {
+    "Ordena hoy tus finanzas": { progress: 72, lesson: "4 de 5" },
+    "Tu primera cartera de inversión": { progress: 45, lesson: "3 de 6" },
+    "Finanzas para decisiones de negocio": { progress: 68, lesson: "5 de 8" },
+    "Cómo leer el mercado cada mañana": { progress: 28, lesson: "2 de 7" },
+    "Flujo de caja sin complicaciones": { progress: 30, lesson: "2 de 5" },
+    "Fondos mutuos desde cero": { progress: 20, lesson: "1 de 6" },
+    "Ahorro con objetivos reales": { progress: 15, lesson: "1 de 4" },
+    "Precios, costos y rentabilidad": { progress: 25, lesson: "2 de 8" },
+  }
+
+  const availableCourses = catalogCourses.filter((course) => {
+    if (accountRole === "full") return true
+    if (accountRole === "free") {
+      return !course.premium || ownedCourses.includes(course.title)
+    }
+    return ownedCourses.includes(course.title) || !course.premium
+  })
+
+  const lockedCourses = catalogCourses.filter(
+    (course) => !availableCourses.some((item) => item.title === course.title),
+  )
+
+  const allReportsMeta = [
     {
       title: "Panorama de mercados · Junio 2025",
       type: "Informe mensual",
@@ -4705,13 +6522,222 @@ function MyLearning() {
       pages: "38 páginas",
     },
     {
+      title: "Guía de fondos mutuos 2025",
+      type: "Informe especial",
+      status: "Disponible",
+      date: "28 May 2025",
+      pages: "31 páginas",
+    },
+    {
+      title: "Claves financieras para empresas",
+      type: "Informe mensual",
+      status: "Disponible",
+      date: "15 May 2025",
+      pages: "22 páginas",
+    },
+    {
       title: "Perspectivas de inversión 2025",
       type: "Informe anual",
       status: "Guardado",
       date: "10 Ene 2025",
       pages: "62 páginas",
     },
+    {
+      title: "Dólar: variables y escenarios",
+      type: "Informe especial",
+      status: "Disponible",
+      date: "22 Abr 2025",
+      pages: "18 páginas",
+    },
   ]
+
+  const savedReports =
+    accountRole === "full"
+      ? allReportsMeta
+      : allReportsMeta.filter((report) => ownedReports.includes(report.title))
+
+  const activeCourse = availableCourses.find(
+    (course) => course.title === activeCourseTitle,
+  )
+
+  if (activeCourse) {
+    const detail =
+      courseDetailsMap[activeCourse.title] ??
+      courseDetailsMap["Tu primera cartera de inversión"]
+    const flatLessons = detail.modules.flatMap((mod, modIdx) =>
+      mod.lessons.map((lesson, lessonIdx) => ({
+        ...lesson,
+        moduleTitle: mod.title,
+        key: `${mod.title}-${lessonIdx}`,
+        order: modIdx * 10 + lessonIdx,
+      })),
+    )
+    const currentLesson =
+      flatLessons[selectedLessonIndex] ?? flatLessons[0]
+    const isLessonDone = completedLessons.includes(currentLesson.key)
+    const toggleLessonComplete = (key: string) => {
+      setCompletedLessons((prev) =>
+        prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key],
+      )
+    }
+
+    return (
+      <div className="learning-classroom">
+        <div className="course-detail-topbar">
+          <button
+            type="button"
+            className="course-detail-back"
+            onClick={() => onSelectActiveCourse(null)}
+          >
+            <span>←</span> Volver a Mis cursos
+          </button>
+          <div className="course-detail-crumbs">
+            <span>{activeCourse.audience}</span>
+            <span>·</span>
+            <strong>{activeCourse.time} de dedicación</strong>
+            <span>·</span>
+            <button
+              type="button"
+              className="classroom-link-btn"
+              onClick={() => onOpenCourse(activeCourse.title)}
+            >
+              Ver ficha completa del curso
+            </button>
+          </div>
+        </div>
+
+        <div className="classroom-grid">
+          <div className="classroom-player-column">
+            <div className="classroom-video-stage">
+              <img src={activeCourse.image} alt={activeCourse.title} />
+              <div className="classroom-video-overlay">
+                <span className="course-preview-tag">
+                  <Icon
+                    name={currentLesson.type === "video" ? "play" : "file"}
+                    size={14}
+                  />
+                  {currentLesson.type === "video"
+                    ? "Lección en video"
+                    : "Ejercicio práctico guiado"}{" "}
+                  · {currentLesson.duration}
+                </span>
+                <div>
+                  <small>{currentLesson.moduleTitle}</small>
+                  <h2>{currentLesson.title}</h2>
+                </div>
+              </div>
+            </div>
+
+            <div className="classroom-lesson-bar">
+              <div>
+                <span className="eyebrow small">{activeCourse.title}</span>
+                <h3>{currentLesson.title}</h3>
+              </div>
+              <div className="classroom-lesson-actions">
+                <button
+                  type="button"
+                  className={isLessonDone ? "secondary small" : "primary small"}
+                  onClick={() => toggleLessonComplete(currentLesson.key)}
+                >
+                  <Icon name="check" size={15} />{" "}
+                  {isLessonDone ? "Lección completada" : "Marcar como completada"}
+                </button>
+                {selectedLessonIndex + 1 < flatLessons.length && (
+                  <button
+                    type="button"
+                    className="secondary small"
+                    onClick={() =>
+                      setSelectedLessonIndex((idx) =>
+                        Math.min(flatLessons.length - 1, idx + 1),
+                      )
+                    }
+                  >
+                    Siguiente lección <Icon name="arrow" size={15} />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="course-detail-box">
+              <h2>Resumen de la lección y objetivos del curso</h2>
+              <p style={{ marginTop: 10, color: "#3b3e52", fontSize: 13, lineHeight: 1.7 }}>
+                {detail.overview[0]}
+              </p>
+              <div className="course-learn-grid">
+                {detail.whatYouWillLearn.map((item) => (
+                  <div className="course-learn-item" key={item}>
+                    <Icon name="check" size={16} />
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <aside className="classroom-playlist">
+            <div className="classroom-playlist-head">
+              <strong>Contenido del curso</strong>
+              <span>
+                {activeCourse.lessons} · {activeCourse.time}
+              </span>
+            </div>
+            <div className="classroom-modules">
+              {detail.modules.map((mod) => (
+                <div className="classroom-module-block" key={mod.title}>
+                  <div className="classroom-module-title">
+                    <strong>{mod.title}</strong>
+                    <small>{mod.duration}</small>
+                  </div>
+                  <ul>
+                    {mod.lessons.map((lesson, lessonIdx) => {
+                      const lessonKey = `${mod.title}-${lessonIdx}`
+                      const globalIdx = flatLessons.findIndex(
+                        (item) => item.key === lessonKey,
+                      )
+                      const active = globalIdx === selectedLessonIndex
+                      const done = completedLessons.includes(lessonKey)
+                      return (
+                        <li key={lessonKey}>
+                          <button
+                            type="button"
+                            className={active ? "active" : ""}
+                            onClick={() => setSelectedLessonIndex(globalIdx)}
+                          >
+                            <span className={done ? "done-dot" : "play-dot"}>
+                              <Icon
+                                name={
+                                  done
+                                    ? "check"
+                                    : lesson.type === "video"
+                                      ? "play"
+                                      : "file"
+                                }
+                                size={12}
+                              />
+                            </span>
+                            <div>
+                              <strong>{lesson.title}</strong>
+                              <small>
+                                {lesson.type === "video"
+                                  ? "Video"
+                                  : "Práctica"}{" "}
+                                · {lesson.duration}
+                              </small>
+                            </div>
+                          </button>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </aside>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <>
       <div className="learning-summary">
@@ -4720,8 +6746,14 @@ function MyLearning() {
             <Icon name="play" size={18} />
           </span>
           <div>
-            <strong>3 cursos</strong>
-            <small>En progreso</small>
+            <strong>{availableCourses.length} cursos</strong>
+            <small>
+              {accountRole === "full"
+                ? "Catálogo completo LAB+"
+                : accountRole === "free"
+                  ? "Cursos gratuitos iniciados"
+                  : "Adquiridos y gratuitos"}
+            </small>
           </div>
         </div>
         <div>
@@ -4729,19 +6761,44 @@ function MyLearning() {
             <Icon name="chart" size={18} />
           </span>
           <div>
-            <strong>3 informes</strong>
-            <small>En tu biblioteca</small>
+            <strong>{savedReports.length} informes</strong>
+            <small>
+              {savedReports.length === 0
+                ? "Sin informes adquiridos aún"
+                : "En tu biblioteca"}
+            </small>
           </div>
         </div>
         <div className="weekly-goal">
           <div>
             <strong>Meta semanal</strong>
-            <small>2 h 40 min de 4 horas</small>
+            <small>
+              {accountRole === "full"
+                ? "2 h 40 min de 4 horas"
+                : accountRole === "free"
+                  ? "1 h 15 min de 2 horas"
+                  : "2 h 10 min de 3 horas"}
+            </small>
           </div>
           <div className="goal-progress">
-            <i />
+            <i
+              style={{
+                width:
+                  accountRole === "full"
+                    ? "67%"
+                    : accountRole === "free"
+                      ? "62%"
+                      : "72%",
+              }}
+            />
           </div>
-          <b>67%</b>
+          <b>
+            {accountRole === "full"
+              ? "67%"
+              : accountRole === "free"
+                ? "62%"
+                : "72%"}
+          </b>
         </div>
       </div>
       <div className="learning-tabs">
@@ -4750,54 +6807,188 @@ function MyLearning() {
           onClick={() => setContent("courses")}
         >
           <Icon name="book" size={17} />
-          Mis cursos <span>3</span>
+          Mis cursos <span>{availableCourses.length}</span>
         </button>
         <button
           className={content === "reports" ? "active" : ""}
           onClick={() => setContent("reports")}
         >
           <Icon name="chart" size={17} />
-          Mis informes <span>3</span>
+          Mis informes <span>{savedReports.length}</span>
         </button>
       </div>
       {content === "courses" ? (
         <div className="my-courses">
           <div className="learning-section-title">
             <div>
-              <h2>Continúa aprendiendo</h2>
-              <p>Retoma tus cursos desde la última lección.</p>
+              <h2>
+                {accountRole === "full"
+                  ? "Todos los cursos disponibles en tu plan LAB+"
+                  : accountRole === "free"
+                    ? "Tus cursos gratuitos iniciados"
+                    : "Tus cursos comprados y gratuitos"}
+              </h2>
+              <p>
+                {accountRole === "full"
+                  ? "Accede sin restricciones a cualquiera de los 8 cursos del catálogo."
+                  : accountRole === "free"
+                    ? "Avanza gratis a tu ritmo y adquiere nuevos cursos o una membresía cuando quieras."
+                    : "Continúa los cursos que compraste individualmente o suma nuevos programas a tu cuenta."}
+              </p>
             </div>
-            <button>
+            <button onClick={() => navigate("discover")}>
               Explorar más cursos <Icon name="arrow" size={16} />
             </button>
           </div>
           <div className="my-course-grid">
-            {activeCourses.map((course, index) => (
-              <article key={course.title}>
+            {availableCourses.map((course, index) => {
+              const stat = progressMap[course.title] ?? {
+                progress: 20,
+                lesson: "1 de 6",
+              }
+              const accessTag = !course.premium
+                ? "Curso gratuito"
+                : accountRole === "full"
+                  ? "Incluido en LAB+"
+                  : "Curso comprado"
+              return (
+              <article
+                key={course.title}
+                onClick={() => {
+                  setSelectedLessonIndex(0)
+                  onSelectActiveCourse(course.title)
+                }}
+              >
                 <div className="my-course-image">
                   <img src={course.image} alt="" />
-                  <span>{index === 0 ? "Último visto" : course.category}</span>
-                  <button aria-label={`Continuar ${course.title}`}>
+                  <span>{index === 0 ? "Último visto" : accessTag}</span>
+                  <button
+                    aria-label={`Continuar ${course.title}`}
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      setSelectedLessonIndex(0)
+                      onSelectActiveCourse(course.title)
+                    }}
+                  >
                     <Icon name="play" size={17} />
                   </button>
                 </div>
                 <div className="my-course-copy">
-                  <span className="eyebrow small">{course.category}</span>
+                  <span className="eyebrow small">
+                    {course.audience} · {course.time}
+                  </span>
                   <h3>{course.title}</h3>
                   <div className="course-progress-copy">
-                    <span>Lección {course.lesson}</span>
-                    <strong>{course.progress}%</strong>
+                    <span>Módulo {stat.lesson}</span>
+                    <strong>{stat.progress}%</strong>
                   </div>
                   <div className="wide-progress">
-                    <i style={{ width: `${course.progress}%` }} />
+                    <i style={{ width: `${stat.progress}%` }} />
                   </div>
-                  <button>
-                    Continuar curso <Icon name="arrow" size={16} />
-                  </button>
+                  <div className="my-course-actions-row">
+                    <button
+                      onClick={(event) => {
+                        event.stopPropagation()
+                        setSelectedLessonIndex(0)
+                        onSelectActiveCourse(course.title)
+                      }}
+                    >
+                      Continuar curso <Icon name="arrow" size={15} />
+                    </button>
+                    <button
+                      className="course-info-link"
+                      onClick={(event) => {
+                        event.stopPropagation()
+                        onOpenCourse(course.title)
+                      }}
+                    >
+                      Ver descripción
+                    </button>
+                  </div>
                 </div>
               </article>
-            ))}
+              )
+            })}
           </div>
+
+          {lockedCourses.length > 0 && (
+            <div className="account-upsell-section">
+              <div className="learning-section-title">
+                <div>
+                  <h2>
+                    {accountRole === "free"
+                      ? "Cursos Premium para ampliar tu aprendizaje"
+                      : "Suma más cursos a tu cuenta"}
+                  </h2>
+                  <p>
+                    Cómpralos de manera individual o desbloquéalos todos con la
+                    membresía LAB+.
+                  </p>
+                </div>
+                <button onClick={() => navigate("plans")}>
+                  Ver membresía LAB+ <Icon name="arrow" size={16} />
+                </button>
+              </div>
+              <div className="my-course-grid">
+                {lockedCourses.slice(0, 3).map((course) => {
+                  const inCart = cartItems.some(
+                    (item) => item.title === course.title,
+                  )
+                  return (
+                    <article
+                      key={course.title}
+                      className="locked-course-card"
+                      onClick={() => onOpenCourse(course.title)}
+                    >
+                      <div className="my-course-image">
+                        <img src={course.image} alt="" />
+                        <span>
+                          <Icon name="lock" size={11} /> {course.price}
+                        </span>
+                      </div>
+                      <div className="my-course-copy">
+                        <span className="eyebrow small">
+                          {course.audience} · {course.lessons} · {course.time}
+                        </span>
+                        <h3>{course.title}</h3>
+                        <p className="locked-course-desc">
+                          {course.description}
+                        </p>
+                        <div className="locked-course-actions">
+                          <button
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              onOpenCourse(course.title)
+                            }}
+                          >
+                            Ver detalle
+                          </button>
+                          <button
+                            type="button"
+                            className="buy-btn"
+                            disabled={inCart}
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              addToCart({
+                                kind: "course",
+                                title: course.title,
+                                subtitle: `${course.lessons} · ${course.time}`,
+                                price: course.price,
+                                image: course.image,
+                              })
+                            }}
+                          >
+                            {inCart ? "En la cesta" : `Añadir · ${course.price}`}
+                          </button>
+                        </div>
+                      </div>
+                    </article>
+                  )
+                })}
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <div className="my-reports account-card">
@@ -4806,105 +6997,157 @@ function MyLearning() {
               <h2>Biblioteca de informes</h2>
               <p>Tus análisis contratados y ediciones guardadas.</p>
             </div>
-            <button>
+            <button onClick={() => navigate("discoverReports")}>
               Explorar informes <Icon name="arrow" size={16} />
             </button>
           </div>
-          <div className="reports-library">
-            {savedReports.map((report, index) => (
-              <article key={report.title}>
-                <div className={`report-cover c${index}`}>
-                  <Icon name="chart" size={22} />
-                  <span>
-                    LAB
-                    <br />
-                    INFORME
+          {savedReports.length > 0 ? (
+            <div className="reports-library">
+              {savedReports.map((report, index) => (
+                <article key={report.title}>
+                  <div className={`report-cover c${index % 3}`}>
+                    <Icon name="chart" size={22} />
+                    <span>
+                      LAB
+                      <br />
+                      INFORME
+                    </span>
+                  </div>
+                  <div className="report-library-copy">
+                    <span className="eyebrow small">{report.type}</span>
+                    <h3>{report.title}</h3>
+                    <p>
+                      {report.date} · {report.pages}
+                    </p>
+                  </div>
+                  <span className={`report-status s${index % 3}`}>
+                    {report.status}
                   </span>
-                </div>
-                <div className="report-library-copy">
-                  <span className="eyebrow small">{report.type}</span>
-                  <h3>{report.title}</h3>
-                  <p>
-                    {report.date} · {report.pages}
-                  </p>
-                </div>
-                <span className={`report-status s${index}`}>
-                  {report.status}
-                </span>
-                <div className="report-actions">
-                  <button>
-                    <Icon name="eye" size={16} /> Leer
-                  </button>
-                  <button aria-label="Más opciones">•••</button>
-                </div>
-              </article>
-            ))}
-          </div>
+                  <div className="report-actions">
+                    <button onClick={() => navigate("discoverReports")}>
+                      <Icon name="eye" size={16} /> Leer
+                    </button>
+                    <button
+                      aria-label="Más opciones"
+                      onClick={() => navigate("discoverReports")}
+                    >
+                      •••
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="empty-reports-state">
+              <Icon name="chart" size={28} />
+              <h3>Aún no tienes informes en tu biblioteca</h3>
+              <p>
+                Con tu cuenta Free puedes comprar informes individuales desde
+                $6.990 o suscribirte a LAB+ para recibir todas las ediciones.
+              </p>
+              <div>
+                <button
+                  type="button"
+                  className="primary small"
+                  onClick={() => navigate("discoverReports")}
+                >
+                  Explorar informes <Icon name="arrow" size={15} />
+                </button>
+                <button
+                  type="button"
+                  className="secondary small"
+                  onClick={() => navigate("plans")}
+                >
+                  Ver planes LAB+
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </>
   )
 }
 
-function History() {
-  return (
-    <>
-      <div className="stats-row">
-        <div>
-          <span>
-            <Icon name="book" />
-          </span>
-          <div>
-            <strong>3</strong>
-            <small>Cursos en progreso</small>
-          </div>
-        </div>
-        <div>
-          <span>
-            <Icon name="clock" />
-          </span>
-          <div>
-            <strong>8,5 h</strong>
-            <small>Tiempo de aprendizaje</small>
-          </div>
-        </div>
-        <div>
-          <span>
-            <Icon name="check" />
-          </span>
-          <div>
-            <strong>12</strong>
-            <small>Contenidos completados</small>
-          </div>
-        </div>
-      </div>
-      <div className="account-card">
-        <div className="card-title">
-          <h2>Continúa aprendiendo</h2>
-          <button>Ver todo</button>
-        </div>
-        <div className="continue-item">
-          <img src={images.calculator} alt="" />
-          <div>
-            <span className="eyebrow small">Finanzas personales</span>
-            <h3>Ordena hoy tus finanzas</h3>
-            <p>Lección 4 de 5 · Presupuesto con propósito</p>
-            <div className="wide-progress">
-              <i />
-            </div>
-          </div>
-          <button className="round-action">
-            <Icon name="play" size={17} />
-          </button>
-        </div>
-      </div>
-      <div className="account-card">
-        <div className="card-title">
-          <h2>Actividad reciente</h2>
-          <button>Filtrar</button>
-        </div>
-        <div className="activity-list">
-          {[
+function History({
+  accountRole,
+  ownedCourses,
+  navigate,
+  onOpenCourse,
+}: {
+  accountRole: AccountRole
+  ownedCourses: string[]
+  navigate: (page: Page) => void
+  onOpenCourse: (courseTitle: string) => void
+}) {
+  const lastCourse =
+    accountRole === "free"
+      ? {
+          category: "Inversiones · Curso gratuito",
+          title: "Tu primera cartera de inversión",
+          lesson: "Módulo 2 de 6 · Riesgo y retorno sin tecnicismos",
+          image: images.laptop,
+          progress: "45%",
+        }
+      : accountRole === "purchased"
+        ? {
+            category: "Empresas · Curso comprado",
+            title: "Finanzas para decisiones de negocio",
+            lesson: "Módulo 5 de 8 · Endeudamiento sano y relación con bancos",
+            image: images.desk,
+            progress: "68%",
+          }
+        : {
+            category: "Finanzas personales · LAB+ Full acceso",
+            title: "Ordena hoy tus finanzas",
+            lesson: "Lección 4 de 5 · Presupuesto con propósito",
+            image: images.calculator,
+            progress: "72%",
+          }
+  const activities =
+    accountRole === "free"
+      ? [
+          [
+            "check",
+            "Completaste un módulo gratuito",
+            "Tu primera cartera de inversión · Módulo 1",
+            "Hoy, 11:10",
+          ],
+          [
+            "book",
+            "Iniciaste un curso gratuito",
+            "Flujo de caja sin complicaciones",
+            "Ayer, 19:05",
+          ],
+          [
+            "play",
+            "Viste la vista previa de un curso",
+            "Ahorro con objetivos reales",
+            "11 Jun, 17:20",
+          ],
+        ]
+      : accountRole === "purchased"
+        ? [
+            [
+              "check",
+              "Compra individual confirmada",
+              "Curso: Precios, costos y rentabilidad ($34.900)",
+              "Hoy, 09:40",
+            ],
+            [
+              "eye",
+              "Leíste tu informe adquirido",
+              "Panorama de mercados · Junio 2025",
+              "Ayer, 18:14",
+            ],
+            [
+              "book",
+              "Avanzaste en tu curso comprado",
+              "Finanzas para decisiones de negocio",
+              "09 Jun, 10:15",
+            ],
+          ]
+        : [
             [
               "check",
               "Completaste una lección",
@@ -4923,7 +7166,89 @@ function History() {
               "Tu primera cartera de inversión",
               "10 Jun, 09:45",
             ],
-          ].map((a, i) => (
+          ]
+  return (
+    <>
+      <div className="stats-row">
+        <div>
+          <span>
+            <Icon name="book" />
+          </span>
+          <div>
+            <strong>
+              {accountRole === "full"
+                ? 8
+                : accountRole === "free"
+                  ? 3
+                  : ownedCourses.length + 3}
+            </strong>
+            <small>Cursos disponibles</small>
+          </div>
+        </div>
+        <div>
+          <span>
+            <Icon name="clock" />
+          </span>
+          <div>
+            <strong>
+              {accountRole === "full"
+                ? "14,5 h"
+                : accountRole === "free"
+                  ? "3,2 h"
+                  : "7,4 h"}
+            </strong>
+            <small>Tiempo de aprendizaje</small>
+          </div>
+        </div>
+        <div>
+          <span>
+            <Icon name="check" />
+          </span>
+          <div>
+            <strong>
+              {accountRole === "full" ? 18 : accountRole === "free" ? 5 : 9}
+            </strong>
+            <small>Contenidos completados</small>
+          </div>
+        </div>
+      </div>
+      <div className="account-card">
+        <div className="card-title">
+          <h2>Continúa aprendiendo</h2>
+          <button onClick={() => navigate("learning")}>Ver todo</button>
+        </div>
+        <div
+          className="continue-item"
+          onClick={() => onOpenCourse(lastCourse.title)}
+          style={{ cursor: "pointer" }}
+        >
+          <img src={lastCourse.image} alt="" />
+          <div>
+            <span className="eyebrow small">{lastCourse.category}</span>
+            <h3>{lastCourse.title}</h3>
+            <p>{lastCourse.lesson}</p>
+            <div className="wide-progress">
+              <i style={{ width: lastCourse.progress }} />
+            </div>
+          </div>
+          <button
+            className="round-action"
+            onClick={(event) => {
+              event.stopPropagation()
+              onOpenCourse(lastCourse.title)
+            }}
+          >
+            <Icon name="play" size={17} />
+          </button>
+        </div>
+      </div>
+      <div className="account-card">
+        <div className="card-title">
+          <h2>Actividad reciente</h2>
+          <button onClick={() => navigate("discover")}>Explorar catálogo</button>
+        </div>
+        <div className="activity-list">
+          {activities.map((a, i) => (
             <div key={a[2]}>
               <span className={`activity-icon a${i}`}>
                 <Icon name={a[0] as IconName} size={18} />
@@ -4941,31 +7266,92 @@ function History() {
   )
 }
 
-function Notifications() {
+function Notifications({
+  accountRole,
+  navigate,
+  onOpenCourse,
+}: {
+  accountRole: AccountRole
+  navigate: (page: Page) => void
+  onOpenCourse: (courseTitle: string) => void
+}) {
+  const items =
+    accountRole === "free"
+      ? [
+          {
+            title: "Continúa tu curso gratuito",
+            text: "Avanza al Módulo 3 de “Tu primera cartera de inversión”.",
+            time: "Hace 1 hora",
+            action: () => onOpenCourse("Tu primera cartera de inversión"),
+          },
+          {
+            title: "Desbloquea todos los cursos con LAB+",
+            text: "Pasa de cuenta Free a membresía LAB+ o compra cursos individuales.",
+            time: "Ayer",
+            action: () => navigate("plans"),
+          },
+          {
+            title: "Nuevo informe de mercados disponible",
+            text: "Adquiere el Panorama de Mercados de Junio en Explorar informes.",
+            time: "12 Jun",
+            action: () => navigate("discoverReports"),
+          },
+        ]
+      : accountRole === "purchased"
+        ? [
+            {
+              title: "Tus cursos comprados están listos",
+              text: "Continúa “Finanzas para decisiones de negocio” donde lo dejaste.",
+              time: "Hace 35 min",
+              action: () =>
+                onOpenCourse("Finanzas para decisiones de negocio"),
+            },
+            {
+              title: "Informe adquirido disponible en tu biblioteca",
+              text: "Lee o descarga “Panorama de mercados · Junio 2025”.",
+              time: "Ayer",
+              action: () => navigate("discoverReports"),
+            },
+            {
+              title: "Completa tu ruta con nuevos cursos",
+              text: "Explora “Cómo leer el mercado cada mañana” o mejora a LAB+.",
+              time: "10 Jun",
+              action: () => onOpenCourse("Cómo leer el mercado cada mañana"),
+            },
+          ]
+        : [
+            {
+              title: "Nuevo informe incluido en tu plan LAB+",
+              text: "Ya puedes leer el Panorama de Mercados de esta semana.",
+              time: "Hace 20 min",
+              action: () => navigate("discoverReports"),
+            },
+            {
+              title: "Sigue avanzando",
+              text: "Te queda una lección para completar “Ordena hoy tus finanzas”.",
+              time: "Ayer",
+              action: () => onOpenCourse("Ordena hoy tus finanzas"),
+            },
+            {
+              title: "Contenido recomendado para ti",
+              text: "Seleccionamos el curso “Fondos mutuos desde cero” según tus intereses.",
+              time: "10 Jun",
+              action: () => onOpenCourse("Fondos mutuos desde cero"),
+            },
+          ]
   return (
     <div className="account-card notifications-card">
       <div className="card-title">
         <h2>Recientes</h2>
-        <button>Marcar todo como leído</button>
+        <button onClick={() => navigate("learning")}>Ir a Mi aprendizaje</button>
       </div>
-      {[
-        [
-          "Nuevo informe disponible",
-          "Ya puedes leer el Panorama de Mercados de esta semana.",
-          "Hace 20 min",
-        ],
-        [
-          "Sigue avanzando",
-          "Te queda una lección para completar “Ordena hoy tus finanzas”.",
-          "Ayer",
-        ],
-        [
-          "Contenido recomendado para ti",
-          "Seleccionamos una guía sobre fondos mutuos según tus intereses.",
-          "10 Jun",
-        ],
-      ].map((n, i) => (
-        <div className={`notification ${i < 2 ? "unread" : ""}`} key={n[0]}>
+      {items.map((n, i) => (
+        <div
+          className={`notification ${i < 2 ? "unread" : ""}`}
+          key={n.title}
+          onClick={n.action}
+          style={{ cursor: "pointer" }}
+        >
           <span>
             <Icon
               name={i === 0 ? "chart" : i === 1 ? "play" : "book"}
@@ -4973,9 +7359,9 @@ function Notifications() {
             />
           </span>
           <div>
-            <strong>{n[0]}</strong>
-            <p>{n[1]}</p>
-            <small>{n[2]}</small>
+            <strong>{n.title}</strong>
+            <p>{n.text}</p>
+            <small>{n.time}</small>
           </div>
           {i < 2 && <i />}
         </div>
@@ -4984,9 +7370,25 @@ function Notifications() {
   )
 }
 
-function Settings() {
-  const [avatar, setAvatar] = useState("CS")
+function Settings({
+  accountRole,
+  ownedCourses,
+  ownedReports,
+  navigate,
+  startCheckout,
+}: {
+  accountRole: AccountRole
+  ownedCourses: string[]
+  ownedReports: string[]
+  navigate: (page: Page) => void
+  startCheckout: (item: PurchaseItem) => void
+}) {
+  const profile = accountRoleProfiles[accountRole]
+  const [avatar, setAvatar] = useState(profile.initials)
   const [avatarPhoto, setAvatarPhoto] = useState<string | null>(null)
+  useEffect(() => {
+    setAvatar(profile.initials)
+  }, [profile.initials])
   const [preferences, setPreferences] = useState({
     weekly: true,
     progress: true,
@@ -5024,7 +7426,7 @@ function Settings() {
           <div className="avatar-options">
             <strong>Elige un avatar</strong>
             <div>
-              {["CS", "C1", "C2", "C3"].map((option, i) => (
+              {[profile.initials, "C1", "C2", "C3"].map((option, i) => (
                 <button
                   aria-label={`Avatar ${i + 1}`}
                   className={`${
@@ -5036,8 +7438,8 @@ function Settings() {
                   }}
                   key={option}
                 >
-                  {option === "CS" ? (
-                    "CS"
+                  {i === 0 ? (
+                    profile.initials
                   ) : (
                     <Icon
                       name={i === 1 ? "spark" : i === 2 ? "chart" : "book"}
@@ -5061,18 +7463,18 @@ function Settings() {
             <small>JPG o PNG · Máximo recomendado 2 MB</small>
           </div>
         </div>
-        <div className="form-grid">
+        <div className="form-grid" key={accountRole}>
           <label>
             Nombre
-            <input defaultValue="Camila" />
+            <input defaultValue={profile.firstName} />
           </label>
           <label>
             Apellido
-            <input defaultValue="Soto" />
+            <input defaultValue={profile.lastName} />
           </label>
           <label className="wide">
             Correo electrónico
-            <input defaultValue="camila@correo.com" />
+            <input defaultValue={profile.email} />
           </label>
         </div>
         <button className="primary small">Guardar cambios</button>
@@ -5080,37 +7482,102 @@ function Settings() {
       <div className="account-card subscription-settings">
         <div className="card-title">
           <div>
-            <h2>Mi suscripción</h2>
-            <p>Estado y uso del plan contratado.</p>
+            <h2>Mi suscripción y accesos</h2>
+            <p>Estado actual de tu cuenta en la plataforma.</p>
           </div>
           <span className="plan-active">
-            <i /> Activa
+            <i />{" "}
+            {accountRole === "full"
+              ? "Activa"
+              : accountRole === "free"
+                ? "Cuenta Free"
+                : "Pago individual"}
           </span>
         </div>
         <div className="current-plan">
-          <span className="plan-monogram">L+</span>
+          <span className="plan-monogram">
+            {accountRole === "full"
+              ? "L+"
+              : accountRole === "free"
+                ? "FR"
+                : "CP"}
+          </span>
           <div>
-            <small>PLAN ACTUAL</small>
-            <strong>Lab+ Anual</strong>
-            <p>Acceso completo hasta el 14 Jun 2026</p>
+            <small>MODALIDAD ACTUAL</small>
+            <strong>{profile.planLabel}</strong>
+            <p>
+              {accountRole === "full"
+                ? "Acceso completo a todos los cursos e informes hasta el 14 Jun 2026"
+                : accountRole === "free"
+                  ? "Acceso a los cursos gratuitos iniciados · Sin cobros recurrentes"
+                  : `${ownedCourses.length} cursos premium y ${ownedReports.length} informe(s) comprados individualmente`}
+            </p>
           </div>
         </div>
         <div className="plan-usage">
           <div>
-            <span>Próximo cobro</span>
-            <strong>$79.990</strong>
-            <small>14 Jun 2026</small>
+            <span>
+              {accountRole === "full" ? "Próximo cobro" : "Membresía LAB+"}
+            </span>
+            <strong>{accountRole === "full" ? "$79.990" : "$79.990 / año"}</strong>
+            <small>
+              {accountRole === "full" ? "14 Jun 2026" : "Ahorra 33% anual"}
+            </small>
           </div>
           <div>
             <span>Contenido incluido</span>
-            <strong>Ilimitado</strong>
-            <small>Cursos e informes</small>
+            <strong>
+              {accountRole === "full"
+                ? "Ilimitado"
+                : accountRole === "free"
+                  ? "3 cursos gratis"
+                  : `${ownedCourses.length} comprados + 3 gratis`}
+            </strong>
+            <small>
+              {accountRole === "full"
+                ? "Cursos e informes"
+                : "Ampliable en cualquier momento"}
+            </small>
           </div>
         </div>
-        <button className="outline-action">
-          Administrar suscripción <Icon name="arrow" size={16} />
-        </button>
-        <button className="cancel-plan">Cancelar renovación automática</button>
+        {accountRole === "full" ? (
+          <>
+            <button
+              className="outline-action"
+              onClick={() => navigate("plans")}
+            >
+              Cambiar ciclo de facturación <Icon name="arrow" size={16} />
+            </button>
+            <button className="cancel-plan">
+              Cancelar renovación automática
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              className="primary full"
+              onClick={() =>
+                startCheckout({
+                  kind: "plan",
+                  title: "Membresía Lab+ Anual",
+                  subtitle: "Renovación anual automática",
+                  price: "$79.990",
+                  planGroup: "membership",
+                  billingCycle: "annual",
+                })
+              }
+            >
+              Pasarme a LAB+ Full Acceso <Icon name="arrow" size={16} />
+            </button>
+            <button
+              className="outline-action"
+              style={{ marginTop: 10 }}
+              onClick={() => navigate("discover")}
+            >
+              Comprar más cursos o informes <Icon name="arrow" size={16} />
+            </button>
+          </>
+        )}
       </div>
       <div className="account-card preferences-settings">
         <div className="card-title">
@@ -5269,9 +7736,35 @@ function Settings() {
 
 export default function App() {
   const [page, setPage] = useState<Page>("home")
+  const [accountRole, setAccountRole] = useState<AccountRole>("full")
+  const [ownedByRole, setOwnedByRole] = useState<{
+    free: { courses: string[]; reports: string[] }
+    purchased: { courses: string[]; reports: string[] }
+  }>({
+    free: {
+      courses: [],
+      reports: [],
+    },
+    purchased: {
+      courses: [
+        "Finanzas para decisiones de negocio",
+        "Precios, costos y rentabilidad",
+      ],
+      reports: ["Panorama de mercados · Junio 2025"],
+    },
+  })
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(
     null,
   )
+  const [selectedCourseTitle, setSelectedCourseTitle] = useState<
+    string | null
+  >(null)
+  const [accountCourseTitle, setAccountCourseTitle] = useState<string | null>(
+    null,
+  )
+  const [activeLearningCourseTitle, setActiveLearningCourseTitle] = useState<
+    string | null
+  >(null)
   const [cartItems, setCartItems] = useState<PurchaseItem[]>([])
   const [addedModalItem, setAddedModalItem] = useState<PurchaseItem | null>(
     null,
@@ -5288,12 +7781,40 @@ export default function App() {
     if (next === "blog") {
       setSelectedArticleId(null)
     }
+    if (next === "catalog") {
+      setSelectedCourseTitle(null)
+    }
+    if (next === "discover") {
+      setAccountCourseTitle(null)
+    }
     setPage(next)
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+  const handleChangeAccountRole = (
+    role: AccountRole,
+    openDashboard = false,
+  ) => {
+    setAccountRole(role)
+    setAccountCourseTitle(null)
+    setActiveLearningCourseTitle(null)
+    if (openDashboard) {
+      setPage("learning")
+      window.scrollTo({ top: 0, behavior: "smooth" })
+    }
+  }
+  const startLearningCourseFromAnywhere = (courseTitle: string) => {
+    setActiveLearningCourseTitle(courseTitle)
+    setPage("learning")
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
   const openArticle = (articleId: string | null) => {
     setSelectedArticleId(articleId)
     setPage("blog")
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+  const openCourse = (courseTitle: string | null) => {
+    setSelectedCourseTitle(courseTitle)
+    setPage("catalog")
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
   const startCheckout = (item: PurchaseItem) => {
@@ -5327,20 +7848,146 @@ export default function App() {
     page === "history" ||
     page === "notifications" ||
     page === "settings"
-  if (page === "login") return <Login navigate={navigate} />
+  const currentOwnedCourses =
+    accountRole === "full"
+      ? catalogCourses.map((course) => course.title)
+      : ownedByRole[accountRole].courses
+  const currentOwnedReports =
+    accountRole === "full" ? [] : ownedByRole[accountRole].reports
+  const cartModalNode = addedModalItem && (
+    <div
+      className="cart-modal-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="cart-modal-title"
+      onClick={() => setAddedModalItem(null)}
+    >
+      <div
+        className="cart-modal"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="cart-modal-head">
+          <div>
+            <span className="cart-modal-check">
+              <Icon name="check" size={16} />
+            </span>
+            <strong id="cart-modal-title">Añadido a la cesta</strong>
+          </div>
+          <button
+            aria-label="Cerrar ventana"
+            onClick={() => setAddedModalItem(null)}
+          >
+            <Icon name="x" size={18} />
+          </button>
+        </div>
+        <div className="cart-modal-item">
+          {addedModalItem.image ? (
+            <img src={addedModalItem.image} alt="" />
+          ) : (
+            <span className="cart-modal-symbol">
+              {addedModalItem.code ?? "IF"}
+            </span>
+          )}
+          <div>
+            <small>
+              {addedModalItem.kind === "report"
+                ? "INFORME DIGITAL"
+                : "CURSO ONLINE"}
+            </small>
+            <h3>{addedModalItem.title}</h3>
+            <p>{addedModalItem.subtitle}</p>
+            <strong>{addedModalItem.price}</strong>
+          </div>
+        </div>
+        <div className="cart-modal-summary">
+          <span>
+            {cartItems.length}{" "}
+            {cartItems.length === 1
+              ? "producto en la cesta"
+              : "productos en la cesta"}
+          </span>
+          <strong>Total: {purchaseTotal(cartItems)}</strong>
+        </div>
+        <div className="cart-modal-actions">
+          <button
+            className="cart-modal-secondary"
+            onClick={() => setAddedModalItem(null)}
+          >
+            Seguir buscando
+          </button>
+          <button className="cart-modal-primary" onClick={goToCartCheckout}>
+            Ir a pagar <Icon name="arrow" size={16} />
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+  if (page === "login")
+    return (
+      <Login
+        navigate={navigate}
+        accountRole={accountRole}
+        onSelectRoleAndEnter={(role) => handleChangeAccountRole(role, true)}
+      />
+    )
   if (page === "checkout")
     return (
       <Checkout
         items={checkoutItems}
         navigate={navigate}
         onComplete={() => {
-          if (!checkoutItems.some((item) => item.kind === "plan")) {
+          if (checkoutItems.some((item) => item.kind === "plan")) {
+            setAccountRole("full")
+          } else {
+            const newCourses = checkoutItems
+              .filter((item) => item.kind === "course")
+              .map((item) => item.title)
+            const newReports = checkoutItems
+              .filter((item) => item.kind === "report")
+              .map((item) => item.title)
+            const targetRole =
+              accountRole === "free" ? "purchased" : accountRole
+            if (targetRole !== "full") {
+              setOwnedByRole((prev) => ({
+                ...prev,
+                [targetRole]: {
+                  courses: Array.from(
+                    new Set([...prev[targetRole].courses, ...newCourses]),
+                  ),
+                  reports: Array.from(
+                    new Set([...prev[targetRole].reports, ...newReports]),
+                  ),
+                },
+              }))
+              setAccountRole(targetRole)
+            }
             setCartItems([])
           }
         }}
       />
     )
-  if (accountPage) return <Dashboard page={page} navigate={navigate} />
+  if (accountPage)
+    return (
+      <>
+        <Dashboard
+          page={page}
+          navigate={navigate}
+          accountRole={accountRole}
+          onChangeAccountRole={(role) => handleChangeAccountRole(role, false)}
+          ownedCourses={currentOwnedCourses}
+          ownedReports={currentOwnedReports}
+          cartItems={cartItems}
+          addToCart={addToCart}
+          startCheckout={startCheckout}
+          goToCartCheckout={goToCartCheckout}
+          accountCourseTitle={accountCourseTitle}
+          onSelectAccountCourse={setAccountCourseTitle}
+          activeLearningCourseTitle={activeLearningCourseTitle}
+          onSelectLearningCourse={setActiveLearningCourseTitle}
+        />
+        {cartModalNode}
+      </>
+    )
   return (
     <div className="app">
       <Header
@@ -5355,20 +8002,33 @@ export default function App() {
           navigate={navigate}
           startCheckout={startCheckout}
           openArticle={openArticle}
+          openCourse={openCourse}
         />
       )}
       {page === "about" && <About navigate={navigate} />}
       {page === "business" && (
-        <LearningPage kind="business" navigate={navigate} />
+        <LearningPage
+          kind="business"
+          navigate={navigate}
+          openCourse={openCourse}
+        />
       )}
       {page === "personal" && (
-        <LearningPage kind="personal" navigate={navigate} />
+        <LearningPage
+          kind="personal"
+          navigate={navigate}
+          openCourse={openCourse}
+        />
       )}
       {page === "catalog" && (
         <PublicCatalog
           navigate={navigate}
           addToCart={addToCart}
+          startCheckout={startCheckout}
           cartItems={cartItems}
+          selectedCourseTitle={selectedCourseTitle}
+          onSelectCourse={openCourse}
+          onStartLearningCourse={startLearningCourseFromAnywhere}
         />
       )}
       {page === "blog" && (
@@ -5382,74 +8042,7 @@ export default function App() {
         <Plans navigate={navigate} startCheckout={startCheckout} />
       )}
       {page === "kit" && <UiKit navigate={navigate} />}
-      {addedModalItem && (
-        <div
-          className="cart-modal-backdrop"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="cart-modal-title"
-          onClick={() => setAddedModalItem(null)}
-        >
-          <div
-            className="cart-modal"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <div className="cart-modal-head">
-              <div>
-                <span className="cart-modal-check">
-                  <Icon name="check" size={16} />
-                </span>
-                <strong id="cart-modal-title">Añadido a la cesta</strong>
-              </div>
-              <button
-                aria-label="Cerrar ventana"
-                onClick={() => setAddedModalItem(null)}
-              >
-                <Icon name="x" size={18} />
-              </button>
-            </div>
-            <div className="cart-modal-item">
-              {addedModalItem.image ? (
-                <img src={addedModalItem.image} alt="" />
-              ) : (
-                <span className="cart-modal-symbol">
-                  {addedModalItem.code ?? "IF"}
-                </span>
-              )}
-              <div>
-                <small>
-                  {addedModalItem.kind === "report"
-                    ? "INFORME DIGITAL"
-                    : "CURSO ONLINE"}
-                </small>
-                <h3>{addedModalItem.title}</h3>
-                <p>{addedModalItem.subtitle}</p>
-                <strong>{addedModalItem.price}</strong>
-              </div>
-            </div>
-            <div className="cart-modal-summary">
-              <span>
-                {cartItems.length}{" "}
-                {cartItems.length === 1
-                  ? "producto en la cesta"
-                  : "productos en la cesta"}
-              </span>
-              <strong>Total: {purchaseTotal(cartItems)}</strong>
-            </div>
-            <div className="cart-modal-actions">
-              <button
-                className="cart-modal-secondary"
-                onClick={() => setAddedModalItem(null)}
-              >
-                Seguir buscando
-              </button>
-              <button className="cart-modal-primary" onClick={goToCartCheckout}>
-                Ir a pagar <Icon name="arrow" size={16} />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {cartModalNode}
     </div>
   )
 }
